@@ -1,41 +1,38 @@
-import { defineConfig } from 'vite';
-import vue from '@vitejs/plugin-vue';
-import { VitePWA, VitePWAOptions } from 'vite-plugin-pwa';
+import { ConfigEnv, defineConfig, loadEnv, UserConfig } from 'vite'
+import vue from '@vitejs/plugin-vue'
+import { resolve } from 'path';
 
-const pwaOptions: Partial<VitePWAOptions> = {
-  includeAssets: ['favicon.svg'],
-  workbox: {
-    sourcemap: true,
-  },
-  manifest: {
-    name: 'pwa demo',
-    short_name: 'demo',
-    theme_color: '#ffffff',
-    icons: [
-      {
-        src: 'pwa-192x192.png',
-        sizes: '192x192',
-        type: 'image/png',
-      },
-      {
-        src: 'pwa-512x512.png',
-        sizes: '512x512',
-        type: 'image/png',
-      },
-      {
-        src: 'pwa-512x512.png',
-        sizes: '512x512',
-        type: 'image/png',
-        purpose: 'any maskable',
-      }
-    ]
-  }
+function pathResolve(dir: string) {
+  return resolve(process.cwd(), '.', dir);
 }
 
 // https://vitejs.dev/config/
-export default defineConfig({
-  plugins: [
-    vue(),
-    VitePWA(pwaOptions),
-  ]
-})
+export default ({ mode }: ConfigEnv): UserConfig => {
+  const root = process.cwd();
+
+  const env = loadEnv(mode, root);
+  return {
+    plugins: [vue()],
+    resolve: {
+      alias: [
+        // /@/xxxx => src/xxxx
+        {
+          find: /\/@\//,
+          replacement: pathResolve('src') + '/',
+        },
+      ],
+    },
+    server: {
+      port: parseInt(env.VITE_PORT),
+      strictPort: false,
+      https: false,
+      proxy: {
+        [env.VITE_API_URL]: {
+          target: env.VITE_API_PROXY,
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/api/, '')
+        }
+      }
+    }
+  }
+}

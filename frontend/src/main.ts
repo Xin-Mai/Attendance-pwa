@@ -1,10 +1,7 @@
 import { createApp } from 'vue';
 import App from './App.vue';
-// import { registerSW } from 'virtual:pwa-register';
+import router from './router/index';
+import Antd from 'ant-design-vue';
+import 'ant-design-vue/dist/antd.css';
 
-// const updateSW = registerSW({
-//   onNeedRefresh() {},
-//   onOfflineReady() {},
-// });
-
-createApp(App).mount('#app')
+createApp(App).use(router).use(Antd).mount('#app')
