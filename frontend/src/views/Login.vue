@@ -5,7 +5,7 @@
     style="margin: 0 auto"
     class="login-card"
   >
-    <template #extra><a href="" style="vertical-align: bottom">register now</a></template>
+    <template #extra><a href="" style="vertical-align: bottom">注册</a></template>
     <a-form
       ref="formInstance"
       :model="formState"
@@ -15,8 +15,10 @@
       @finishFailed="onFinishFailed"
     >
       <a-form-item
-        label="Username"
+        label="用户名"
         name="username"
+        :labelCol="labelCol"
+        labelAlign="left"
         :rules="[{ required: true, message: 'Please input your username!' }]"
       >
         <a-input v-model:value="formState.username">
@@ -27,8 +29,10 @@
       </a-form-item>
 
       <a-form-item
-        label="Password"
+        label="密码"
         name="password"
+        :labelCol="labelCol"
+        labelAlign="left"
         :rules="[{ required: true, message: 'Please input your password!' }]"
       >
         <a-input-password v-model:value="formState.password">
@@ -40,9 +44,9 @@
 
       <div class="login-form-wrap">
         <a-form-item name="remember" no-style>
-          <a-checkbox v-model:checked="formState.remember">Remember me</a-checkbox>
+          <a-checkbox v-model:checked="formState.remember">记住我</a-checkbox>
         </a-form-item>
-        <a class="login-form-forgot" href="">Forgot password</a>
+        <a class="login-form-forgot" href="">忘记密码</a>
       </div>
 
       <a-form-item>
@@ -51,9 +55,9 @@
           type="primary" 
           html-type="submit"
           class="login-form-button"
-          @click.prevent="onSubmit"
+          @click="onSubmit"
         >
-          Log in
+          登录
         </a-button>
       </a-form-item>
     </a-form>
@@ -98,7 +102,8 @@ export default defineComponent({
       .validate()
       .then(() => {
         LoginApi(formState);
-      }).catch((err: any) => {
+      })
+      .catch((err: any) => {
         console.log(err);
       });
     };
@@ -116,6 +121,9 @@ export default defineComponent({
         'font-weight': 'bold',
         // 'font-size': 'x-large',
         'text-align': 'left',
+      },
+      labelCol: {
+        span: 4,
       }
     };
   },

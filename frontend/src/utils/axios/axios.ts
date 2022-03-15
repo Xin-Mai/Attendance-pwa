@@ -29,6 +29,7 @@ axiosInstance.interceptors.response.use(
   }, 
   (error: any) => {
     // 对响应错误做点什么
+		console.log(error);
     if (error.response && error.response.status) {
       const status: number = error.response.status;
       let message: string | null = null;
