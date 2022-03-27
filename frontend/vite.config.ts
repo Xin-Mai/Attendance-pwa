@@ -30,9 +30,10 @@ export default ({ mode }: ConfigEnv): UserConfig => {
         [env.VITE_API_URL]: {
           target: env.VITE_API_PROXY,
           changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/api/, '')
+          rewrite: (path) => path.replace(/^\/api/, ''),
         }
       }
     }
   }
 }
+

@@ -6,14 +6,15 @@ const axiosInstance: AxiosInstance = axios.create({
   baseURL: apiUrl,
   timeout: 5000,
   headers:{
-    'Content-Type': 'application/json;charset=UTF-8;'
+    // 'Content-Type': 'application/json;charset=UTF-8;'
+		'Content-Type': 'application/json'
   },
 });
 
 //请求拦截器
 axiosInstance.interceptors.request.use(
   (config: AxiosRequestConfig) => {
-    console.log('axios sending request', config);
+		console.log('axios sending request', config);
     return config;
   },
   (error: any) => {
