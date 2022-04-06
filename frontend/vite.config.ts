@@ -1,5 +1,5 @@
-import { ConfigEnv, defineConfig, loadEnv, UserConfig } from 'vite'
-import vue from '@vitejs/plugin-vue'
+import { ConfigEnv, defineConfig, loadEnv, UserConfig } from 'vite';
+import vue from '@vitejs/plugin-vue';
 import { resolve } from 'path';
 
 function pathResolve(dir: string) {
@@ -31,9 +31,8 @@ export default ({ mode }: ConfigEnv): UserConfig => {
           target: env.VITE_API_PROXY,
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api/, ''),
-        }
-      }
-    }
-  }
-}
-
+        },
+      },
+    },
+  };
+};
