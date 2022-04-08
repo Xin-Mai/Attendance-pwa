@@ -1,156 +1,106 @@
 <template>
-  <a-card
-    title="登录"
-    :head-style="headStyle"
-    style="margin: 0 auto"
-    class="login-card"
-  >
-    <template #extra
-      ><a href="" style="vertical-align: bottom">注册</a></template
+  <div class="container">
+    <a-card
+      title="登录"
+      :head-style="headStyle"
+      class="login-card responsive front"
     >
-    <a-form
-      ref="formInstance"
-      :model="formState"
-      name="normal_login"
-      class="login-form"
-      @finish="onFinish"
-      @finishFailed="onFinishFailed"
+      <template #extra>
+        <a-button type="link" style="vertical-align: bottom" @click="reverse">
+          注册
+        </a-button>
+      </template>
+      <sign-in></sign-in>
+    </a-card>
+    <a-card
+      title="注册"
+      :head-style="headStyle"
+      class="login-card responsive back"
     >
-      <a-form-item
-        label="用户名"
-        name="username"
-        :label-col="labelCol"
-        label-align="left"
-        :rules="[{ required: true, message: 'Please input your username!' }]"
-      >
-        <a-input v-model:value="formState.username">
-          <template #prefix>
-            <UserOutlined class="site-form-item-icon" />
-          </template>
-        </a-input>
-      </a-form-item>
-
-      <a-form-item
-        label="密码"
-        name="password"
-        :label-col="labelCol"
-        label-align="left"
-        :rules="[{ required: true, message: 'Please input your password!' }]"
-      >
-        <a-input-password v-model:value="formState.password">
-          <template #prefix>
-            <LockOutlined class="site-form-item-icon" />
-          </template>
-        </a-input-password>
-      </a-form-item>
-
-      <div class="login-form-wrap">
-        <a-form-item name="remember" no-style>
-          <a-checkbox v-model:checked="formState.remember">记住我</a-checkbox>
-        </a-form-item>
-        <a class="login-form-forgot" href="">忘记密码</a>
-      </div>
-
-      <a-form-item>
-        <a-button
-          :disabled="disabled"
-          type="primary"
-          html-type="submit"
-          class="login-form-button"
-          @click="onSubmit"
-        >
+      <template #extra>
+        <a-button type="link" style="vertical-align: bottom" @click="reverse">
           登录
         </a-button>
-      </a-form-item>
-    </a-form>
-  </a-card>
+      </template>
+      <sign-up></sign-up>
+    </a-card>
+  </div>
 </template>
 <script lang="ts">
-import { defineComponent, reactive, computed, ref } from 'vue';
-import { UserOutlined, LockOutlined } from '@ant-design/icons-vue';
-import { Form } from 'ant-design-vue';
-import { LoginApi } from '../api/accout';
-interface FormState {
-  username: string;
-  password: string;
-  remember: boolean;
-}
+import { defineComponent, computed, Ref, ref, onMounted } from 'vue';
+import SignUp from '../components/Sign/SignUp.vue';
+import SignIn from '../components/Sign/SignIn.vue';
+
 export default defineComponent({
+  // eslint-disable-next-line vue/multi-word-component-names
   name: 'Login',
   components: {
-    UserOutlined,
-    LockOutlined
+    SignUp,
+    SignIn,
   },
   setup() {
-    const formInstance = ref<typeof Form | null>(null);
-    const formState = reactive<FormState>({
-      username: '',
-      password: '',
-      remember: true
-    });
-    const onFinish = (values: any) => {
-      console.log('Success:', values);
+    const isSignUp: Ref<boolean> = ref(false);
+    const front: Ref<HTMLDivElement | null> = ref(null);
+    const back: Ref<HTMLDivElement | null> = ref(null);
+    // 翻转卡片
+    const reverse = () => {
+      if (!front.value || !back.value) return;
+      isSignUp.value = !isSignUp.value;
+      front.value.style.transform = isSignUp.value
+        ? 'translate(-50%, -50%) rotateY(180deg)'
+        : '';
+      back.value.style.transform = isSignUp.value
+        ? 'translate(-50%, -50%)'
+        : 'translate(-50%, -50%) rotateY(-180deg)';
     };
 
-    const onFinishFailed = (errorInfo: any) => {
-      console.log('Failed:', errorInfo);
-    };
-
-    const onSubmit = () => {
-      console.log('submit', formInstance.value);
-      if (!formInstance.value) return;
-      // 验证表单
-      formInstance.value
-        .validate()
-        .then(() => {
-          LoginApi(formState);
-        })
-        .catch((err: any) => {
-          console.log(err);
-        });
-    };
-    const disabled = computed(() => {
-      return !(formState.username && formState.password);
+    onMounted(() => {
+      front.value = document.getElementsByClassName(
+        'front'
+      )[0] as HTMLDivElement;
+      back.value = document.getElementsByClassName('back')[0] as HTMLDivElement;
     });
     return {
-      formInstance,
-      formState,
-      onFinish,
-      onFinishFailed,
-      onSubmit,
-      disabled,
+      isSignUp,
+      reverse,
       headStyle: {
         'font-weight': 'bold',
         // 'font-size': 'x-large',
-        'text-align': 'left'
+        'text-align': 'left',
       },
-      labelCol: {
-        span: 4
-      }
     };
-  }
+  },
 });
 </script>
 <style scoped>
+.container {
+  width: 100%;
+  height: 100%;
+}
 .login-card {
   max-width: 500px;
-  display: relative;
-  top: 50%;
-  transform: translateY(-50%);
+  transform-style: preserve-3d;
+  transition: 0.5s all;
+  backface-visibility: hidden;
 }
 
-.login-form {
-  margin: auto;
+.responsive {
+  width: 500px;
 }
-.login-form-wrap {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+
+@media only screen and (max-width: 550px) {
+  .responsive {
+    width: 90%;
+  }
 }
-.login-form-forgot {
-  margin-bottom: 24px;
+.front,
+.back {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
-.login-form-button {
-  width: 100%;
+.back {
+  transform: rotateY(-180deg);
 }
 </style>

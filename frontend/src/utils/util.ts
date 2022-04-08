@@ -9,13 +9,14 @@ export function formatter(date: Date, format: string): string {
   };
 
   for (const k in o) {
-    console.log('test');
-    if (new RegExp(k).test(format)) {
-      format.replace(
-        RegExp.$1,
-        RegExp.$1.length === 1
+    const exp: RegExp = new RegExp(`(${k})`, 'g');
+    if (exp.test(format)) {
+      const match: string = RegExp.$1;
+      format = format.replace(
+        match,
+        match.length === 1
           ? '' + o[k]
-          : ('00' + o[k]).substr(('' + o[k]).length)
+          : ('00' + o[k]).substring(('' + o[k]).length + 2 - match.length)
       );
     }
   }

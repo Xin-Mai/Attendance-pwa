@@ -1,22 +1,28 @@
-export const columns = [
+import type { TableColumnsType } from 'ant-design-vue';
+export const columns: TableColumnsType = [
   {
     title: '学号',
     dataIndex: 'uid',
     key: 'uid',
+    width: 100,
   },
   {
     title: '姓名',
     dataIndex: 'name',
     key: 'name',
+    width: 60,
   },
   {
     title: '出勤状态',
     dataIndex: 'status',
     key: 'status',
+    width: 60,
   },
   {
     title: '操作',
     key: 'action',
+    fixed: 'right',
+    width: 100,
   },
 ];
 

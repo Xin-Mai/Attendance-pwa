@@ -25,7 +25,7 @@
 <script lang="ts">
 import type { SelectProps } from 'ant-design-vue';
 import { defineComponent, reactive, UnwrapRef, ref, toRaw, watch } from 'vue';
-import { AbsentForm, AbsentReason } from '../schemas';
+import { AbsentForm, AbsentReason } from '/@/schemas';
 
 export default defineComponent({
   name: 'AbsentModal',

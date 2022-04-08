@@ -2,21 +2,27 @@
   <a-modal
     :visible="visible"
     title="考勤数据确认"
+    style="border: 1px solid"
     @ok="handleOK"
     @cancel="$emit('close')"
   >
-    <label>日期</label>
-    <template v-for="row in ConfirmRow" :key="row.key">
-      <label>{{ row.label }}</label>
-      <p>{{ dataSource[row.key] }}</p>
-    </template>
+    <table>
+      <tr v-for="row in ConfirmRow" :key="row.key">
+        <th class="tableLabel">{{ row.label }}</th>
+        <td>
+          {{ dataSource[row.key] }}
+          <label v-if="row.key === 'present' || row.key === 'absent'">人</label>
+          <label v-else-if="row.key === 'presentPercent'">%</label>
+        </td>
+      </tr>
+    </table>
   </a-modal>
 </template>
 
 <script lang="ts">
 import { defineComponent, reactive, UnwrapRef, watchEffect } from 'vue';
-import { ConfirmRow, ConfirmData } from '../schemas';
-import { formatter } from '../utils/util';
+import { ConfirmRow, ConfirmData } from '/@/schemas';
+import { formatter } from '/@/utils/util';
 
 export default defineComponent({
   name: 'ConfirmModal',
@@ -34,12 +40,12 @@ export default defineComponent({
       default: 0,
     },
   },
-  emits: ['close'],
+  emits: ['close', 'confirm'],
   setup(props, { emit }) {
     // 初始化
     const dataSource: UnwrapRef<ConfirmData> = reactive({
       date: formatter(new Date(), 'yyyy年MM月dd日 hh:mm'),
-      teacher: '',
+      teacher: '陈长清',
       course: '摸鱼',
       present: 0,
       absent: 0,
@@ -47,11 +53,12 @@ export default defineComponent({
     });
 
     const handleOK = () => {
-      console.log('ok');
-      emit('close');
+      console.log('confirm data');
+      emit('confirm');
     };
 
     watchEffect(() => {
+      dataSource.date = formatter(new Date(), 'yyyy年MM月dd日 hh:mm');
       dataSource.present = props.present;
       dataSource.absent = props.total - props.present;
       dataSource.presentPercent = Math.floor(
@@ -67,3 +74,12 @@ export default defineComponent({
   },
 });
 </script>
+
+<style scoped>
+.tableLabel {
+  /**文字左对齐 */
+  text-align: start;
+  width: 4rem;
+  min-width: 3rem;
+}
+</style>
