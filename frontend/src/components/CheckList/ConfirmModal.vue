@@ -2,7 +2,6 @@
   <a-modal
     :visible="visible"
     title="考勤数据确认"
-    style="border: 1px solid"
     @ok="handleOK"
     @cancel="$emit('close')"
   >
@@ -20,7 +19,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, UnwrapRef, watchEffect } from 'vue';
+import { defineComponent, reactive, UnwrapRef, watchEffect, watch } from 'vue';
 import { ConfirmRow, ConfirmData } from '/@/schemas';
 import { formatter } from '/@/utils/util';
 
@@ -39,6 +38,14 @@ export default defineComponent({
       type: Number,
       default: 0,
     },
+    className: {
+      type: String,
+      default: '',
+    },
+    course: {
+      type: String,
+      default: '',
+    },
   },
   emits: ['close', 'confirm'],
   setup(props, { emit }) {
@@ -46,7 +53,8 @@ export default defineComponent({
     const dataSource: UnwrapRef<ConfirmData> = reactive({
       date: formatter(new Date(), 'yyyy年MM月dd日 hh:mm'),
       teacher: '陈长清',
-      course: '摸鱼',
+      course: props.course,
+      className: props.className,
       present: 0,
       absent: 0,
       presentPercent: 0,
@@ -57,8 +65,14 @@ export default defineComponent({
       emit('confirm');
     };
 
-    watchEffect(() => {
+    const updateTime = () => {
+      console.log('update');
       dataSource.date = formatter(new Date(), 'yyyy年MM月dd日 hh:mm');
+    };
+
+    watchEffect(() => {
+      dataSource.className = props.className;
+      dataSource.course = props.course;
       dataSource.present = props.present;
       dataSource.absent = props.total - props.present;
       dataSource.presentPercent = Math.floor(
@@ -68,8 +82,9 @@ export default defineComponent({
 
     return {
       dataSource,
-      handleOK,
       ConfirmRow,
+      handleOK,
+      updateTime,
     };
   },
 });

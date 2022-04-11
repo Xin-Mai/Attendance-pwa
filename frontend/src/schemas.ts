@@ -16,13 +16,13 @@ export const columns: TableColumnsType = [
     title: '出勤状态',
     dataIndex: 'status',
     key: 'status',
-    width: 60,
+    width: 50,
   },
   {
     title: '操作',
     key: 'action',
     fixed: 'right',
-    width: 100,
+    width: 80,
   },
 ];
 
@@ -38,6 +38,10 @@ export const ConfirmRow = [
   {
     label: '课程',
     key: 'course',
+  },
+  {
+    label: '班级',
+    key: 'className',
   },
   {
     label: '出勤',
@@ -57,6 +61,7 @@ export interface ConfirmData {
   date: string;
   teacher: string;
   course: string;
+  className: string;
   present: number;
   absent: number;
   presentPercent: number;
@@ -69,6 +74,7 @@ export interface AbsentForm {
 }
 
 export interface Row {
+  key: string | number;
   uid: string;
   name: string;
   status?: boolean;

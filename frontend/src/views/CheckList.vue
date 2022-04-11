@@ -1,4 +1,5 @@
 <template>
+  <common-header title="考勤" />
   <a-table
     :columns="columns"
     :row-selection="rowSelection"
@@ -15,15 +16,10 @@
         </label>
       </template>
       <template v-else-if="column.key === 'action'">
-        <a-checkbox
-          v-model:checked="record.status"
-          @change="statusChange(index)"
-        >
-          签到
-        </a-checkbox>
         <a-button
           type="link"
           :disabled="record.status"
+          style="padding: 0"
           @click="showAbsentModal(index)"
         >
           缺席登记
@@ -31,13 +27,16 @@
       </template>
     </template>
   </a-table>
-  <div class="footer">
+  <common-footer :show="true">
     <a-button type="primary" @click="showDetail">确认</a-button>
-  </div>
+  </common-footer>
   <confirm-modal
+    ref="confirmModal"
     :visible="modalVisible"
     :present="presentCount"
     :total="data.length"
+    :class-name="className"
+    :course="course"
     @confirm="confirmData"
     @close="closeConfirmModal"
   />
@@ -55,7 +54,6 @@ import {
   reactive,
   ref,
   Ref,
-  unref,
   UnwrapRef,
   watchEffect,
 } from 'vue';
@@ -63,35 +61,56 @@ import ConfirmModal from '../components/CheckList/ConfirmModal.vue';
 import AbsentModal from '../components/CheckList/AbsentModal.vue';
 import type { TableProps } from 'ant-design-vue';
 import { AbsentForm, AbsentReason, columns, Row } from '../schemas';
+import CommonFooter from '/@/components/common/Footer.vue';
+import CommonHeader from '/@/components/common/Header.vue';
 
 export default defineComponent({
   name: 'CheckList',
-  components: { ConfirmModal, AbsentModal },
+  components: { ConfirmModal, AbsentModal, CommonFooter, CommonHeader },
+  props: {
+    className: {
+      type: String,
+      default: '',
+    },
+    course: {
+      type: String,
+      default: '',
+    },
+  },
   setup() {
     const data: Row[] = [
       {
-        key: '1',
+        key: 1,
         uid: 'U201817122',
         name: '麦晓欣',
         status: false,
       },
       {
-        key: '2',
+        key: 2,
         uid: 'U201817121',
         name: '赵敏',
         status: false,
       },
       {
-        key: '3',
+        key: 3,
         uid: 'U201817120',
         name: '张雨莹',
         status: false,
       },
     ];
+    // ref
+    const confirmModal: Ref<null | typeof ConfirmModal> = ref(null);
     // 出勤checkbox配置
-    const selectedRowKeys = ref<string[]>([]);
+    const selectedRowKeys = ref<number[]>([]);
     const rowSelection: TableProps['rowSelection'] = {
       fixed: true,
+      columnTitle: '签到',
+      onSelect: (record, selected) => {
+        // data[record.key].status = selected;
+        record.status = selected;
+        statusChange(record.key - 1);
+      },
+      // 全选与取消全选应该在这里处理
       onChange: (selectedRowKeys, selectedRows) => {
         console.log(
           `selectedRowKeys: ${selectedRowKeys}`,
@@ -105,6 +124,9 @@ export default defineComponent({
     const presentCount: Ref<number> = ref(0);
     // 显示统计数据
     const showDetail = () => {
+      if (confirmModal.value) {
+        confirmModal.value.updateTime();
+      }
       modalVisible.value = true;
     };
     //关闭确认弹窗
@@ -197,6 +219,7 @@ export default defineComponent({
       logAbsent,
       closeAbsentModal,
       test: ref(false),
+      confirmModal,
     };
   },
 });
