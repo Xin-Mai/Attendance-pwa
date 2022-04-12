@@ -2,6 +2,7 @@
 enum Api {
   LOGIN = '/login',
   SIGNUP = '/signup',
+  COURSES_LIST = '/courses/list',
 }
 
 export default Api;

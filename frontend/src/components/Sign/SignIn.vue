@@ -62,6 +62,8 @@ import { Router, useRouter } from 'vue-router';
 import { UserOutlined, LockOutlined } from '@ant-design/icons-vue';
 import { Form } from 'ant-design-vue';
 import { LoginApi } from '/@/api/accout';
+import Store from '/@/store/store';
+
 interface FormState {
   username: string;
   password: string;
@@ -97,8 +99,9 @@ export default defineComponent({
       // 验证表单
       formInstance.value
         .validate()
-        .then(() => {
-          LoginApi(formState);
+        .then(async () => {
+          await LoginApi(formState);
+          Store.action.signIn(formState.username, formState.remember);
           router.push('/');
         })
         .catch((err: any) => {

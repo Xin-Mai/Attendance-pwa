@@ -60,6 +60,7 @@ export default defineComponent({
       )[0] as HTMLDivElement;
       back.value = document.getElementsByClassName('back')[0] as HTMLDivElement;
     });
+
     return {
       isSignUp,
       reverse,

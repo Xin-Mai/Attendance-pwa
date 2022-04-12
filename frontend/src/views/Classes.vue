@@ -2,6 +2,9 @@
   <div class="container">
     <a-card class="header">
       <h1 class="header-text">{{ name }}老师，你好</h1>
+      <a-button class="header-button" type="link" danger @click="signOut"
+        >登出</a-button
+      >
     </a-card>
     <a-card class="tree-container" title="课程与班级">
       <template #extra>
@@ -47,9 +50,11 @@
 import { computed, defineComponent, ref, Ref } from 'vue';
 import { Router, useRouter } from 'vue-router';
 import { EditOutlined, PlusOutlined } from '@ant-design/icons-vue';
+import CommonFooter from '/@/components/common/Footer.vue';
 import type { TreeProps } from 'ant-design-vue';
 import { DataNode } from 'ant-design-vue/lib/tree';
-import CommonFooter from '/@/components/common/Footer.vue';
+import { CoursesListApi } from '/@/api/course';
+import Store from '/@/store/store';
 
 export default defineComponent({
   name: 'ClassesList',
@@ -73,6 +78,7 @@ export default defineComponent({
         classes: [],
       },
     ];
+    CoursesListApi();
     // 处理数据
     const treeData = computed(() => {
       const treeArr: TreeProps['treeData'] = [];
@@ -113,13 +119,20 @@ export default defineComponent({
         },
       });
     };
+
+    // 登出
+    const signOut = () => {
+      Store.action.signOut();
+      router.push({ name: 'login' });
+    };
     return {
-      name: '陈长清',
+      name: Store.state.username,
       checkable,
       treeData,
       manage,
       manageable,
       checkPresent,
+      signOut,
     };
   },
 });
@@ -155,6 +168,11 @@ export default defineComponent({
 .header .header-text {
   font-size: 1.125rem;
   line-height: 1.75rem;
+  display: inline-block;
+}
+
+.header .header-button {
+  float: right;
 }
 .tree-container {
   margin-top: 1rem;
