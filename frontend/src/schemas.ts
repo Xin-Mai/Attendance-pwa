@@ -57,6 +57,16 @@ export const ConfirmRow = [
   },
 ];
 
+interface CourseItem {
+  course: string;
+  classes: string[];
+}
+
+// 使用签名索引表达数组
+export interface CoursesList {
+  [index: number]: CourseItem;
+}
+
 export interface ConfirmData {
   date: string;
   teacher: string;

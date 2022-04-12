@@ -2,9 +2,9 @@
   <div class="container">
     <a-card class="header">
       <h1 class="header-text">{{ name }}老师，你好</h1>
-      <a-button class="header-button" type="link" danger @click="signOut"
-        >登出</a-button
-      >
+      <a-button class="header-button" type="link" danger @click="signOut">
+        登出
+      </a-button>
     </a-card>
     <a-card class="tree-container" title="课程与班级">
       <template #extra>
