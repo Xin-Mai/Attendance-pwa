@@ -34,8 +34,7 @@ async function login(userInfo) {
     throw new Error('请检查账号与密码是否正确');
     // return '请检查账号与密码是否正确';
   } else {
-    console.log(res);
-    return 'login success';
+    return res;
   }
 }
 
@@ -64,7 +63,8 @@ async function find(options) {
 // 添加账号
 async function add(userInfo) {
   const newUser = new User(userInfo);
-  await newUser.save();
+  const record = await newUser.save();
+  return record;
 }
 module.exports = {
   login,

@@ -5,7 +5,7 @@ const AccountControllor = require('../controllor/accountControllor');
 const router = new Router();
 
 router.post('login', '/login', async ( ctx ) => {
-  console.log('body:', ctx.request.body);
+  console.log('login');
   await AccountControllor.login(ctx);
 });
 
