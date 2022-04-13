@@ -52,7 +52,7 @@ To get the courses list and the related classes name of current user
 ]
 ```
 
-### /cousrses/add POST
+### /courses/add POST
 当前用户新增课程
 To add a course to the courses list of current user
 ```json
@@ -69,7 +69,7 @@ To remove a course from the courses list of current user
     "course": string
 }
 ```
-### /course/update POST
+### /courses/update POST
 更新课程名
 To change the name of a course
 ```json
@@ -107,7 +107,9 @@ To update the information of a class, including changing the name of the class
 {
     "course": string,
     "className": string,
-    "newName": string,
+    "new": {
+	"className": string,
+    }
 }
 ```
 
