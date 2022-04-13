@@ -57,7 +57,7 @@ export const ConfirmRow = [
   },
 ];
 
-interface CourseItem {
+export interface CourseItem {
   course: string;
   classes: string[];
 }

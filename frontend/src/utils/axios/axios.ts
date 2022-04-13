@@ -29,11 +29,11 @@ axiosInstance.interceptors.request.use(
 axiosInstance.interceptors.response.use(
   (response: AxiosResponse) => {
     // 对响应数据做点什么
-    return response;
+    return response.data;
   },
   (error: any) => {
     // 对响应错误做点什么
-    console.log(error);
+    console.log('get error', error);
     if (error.response && error.response.status) {
       const status: number = error.response.status;
       let message: string | null = null;

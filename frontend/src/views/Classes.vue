@@ -8,6 +8,9 @@
     </a-card>
     <a-card class="tree-container" title="课程与班级">
       <template #extra>
+        <a-button v-if="manageable" type="link" @click="handleAddCourse">
+          添加课程
+        </a-button>
         <a-switch
           v-model:checked="manageable"
           checked-children="管理"
@@ -40,6 +43,15 @@
         </template>
       </a-tree>
     </a-card>
+    <a-modal v-model:visible="isAddCourse" @ok="addCourse">
+      <a-input
+        v-model:value="addCourseInput"
+        show-count
+        :maxlength="20"
+        @press-enter="addCourse"
+      />
+      <label v-show="addFailed" style="font: red">{{ failedMessage }}</label>
+    </a-modal>
     <common-footer :show="manageable">
       <a-button type="link" danger>删除</a-button>
     </common-footer>
@@ -53,8 +65,9 @@ import { EditOutlined, PlusOutlined } from '@ant-design/icons-vue';
 import CommonFooter from '/@/components/common/Footer.vue';
 import type { TreeProps } from 'ant-design-vue';
 import { DataNode } from 'ant-design-vue/lib/tree';
-import { CoursesListApi } from '/@/api/course';
+import { CoursesListApi, CoursesAddApi } from '/@/api/course';
 import Store from '/@/store/store';
+import { CourseItem } from '../schemas';
 
 export default defineComponent({
   name: 'ClassesList',
@@ -68,20 +81,25 @@ export default defineComponent({
     const checkable: Ref<boolean> = ref(false);
     const manageable: Ref<boolean> = ref(false);
     // 模拟的数据
-    const data: { course: string; classes: string[] }[] = [
-      {
-        course: '软件工程',
-        classes: ['软件1806', '软件1805'],
-      },
-      {
-        course: '编译原理',
-        classes: [],
-      },
-    ];
-    CoursesListApi();
+    // const data: CourseItem[] = [
+    //   {
+    //     course: '软件工程',
+    //     classes: ['软件1806', '软件1805'],
+    //   },
+    //   {
+    //     course: '编译原理',
+    //     classes: [],
+    //   },
+    // ];
+    const dataSource: Ref<CourseItem[]> = ref([]);
+    // const data: CoursesList = await
+    CoursesListApi().then((val) => {
+      dataSource.value = val as unknown as CourseItem[];
+    });
     // 处理数据
     const treeData = computed(() => {
       const treeArr: TreeProps['treeData'] = [];
+      const data = dataSource.value;
       for (let i = 0; i < data.length; i++) {
         const record = data[i];
         // 可能需要去重
@@ -114,10 +132,41 @@ export default defineComponent({
       router.push({
         name: 'check',
         params: {
-          course: data[parseInt(arr[0])].course,
-          className: data[parseInt(arr[0])].classes[parseInt(arr[1])],
+          course: dataSource.value[parseInt(arr[0])].course,
+          className:
+            dataSource.value[parseInt(arr[0])].classes[parseInt(arr[1])],
         },
       });
+    };
+
+    // 添加课程
+    const isAddCourse: Ref<boolean> = ref(false);
+    const addCourseInput: Ref<string> = ref('');
+    const addFailed: Ref<boolean> = ref(false);
+    const failedMessage: Ref<string> = ref('');
+    const handleAddCourse = () => {
+      isAddCourse.value = !isAddCourse.value;
+    };
+    // 查看新添加的课程是否已重复
+    const checkDuplicate = (): boolean => {
+      for (const record of dataSource.value) {
+        if (record.course === addCourseInput.value) {
+          return false;
+        }
+      }
+      return true;
+    };
+    const addCourse = () => {
+      // 看名字是否重复
+      if (checkDuplicate()) {
+        CoursesAddApi({ course: addCourseInput.value }).then(() => {
+          addCourseInput.value = '';
+          isAddCourse.value = false;
+        });
+      } else {
+        addFailed.value = true;
+        failedMessage.value = '课程已存在';
+      }
     };
 
     // 登出
@@ -125,14 +174,23 @@ export default defineComponent({
       Store.action.signOut();
       router.push({ name: 'login' });
     };
+
     return {
       name: Store.state.username,
       checkable,
+      dataSource,
       treeData,
       manage,
       manageable,
       checkPresent,
       signOut,
+      // 添加课程
+      isAddCourse,
+      handleAddCourse,
+      addCourse,
+      addCourseInput,
+      addFailed,
+      failedMessage,
     };
   },
 });
