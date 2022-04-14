@@ -1,7 +1,8 @@
 const Koa = require('koa');
-
+const jwt = require('koa-jwt');
 const BodyPraser = require('koa-bodyparser');
 const router = require('./router/router');
+const { ENCRYPTION_KEY } = require('./common/cryp');
 
 const app = new Koa();
 
@@ -15,6 +16,14 @@ app.use(BodyPraser());
 //   }
 // })
 
+app.use(
+  jwt({
+    secret: ENCRYPTION_KEY,
+    cookie: 'token',
+    debug: true,
+  })
+  .unless({ path: [/^\/login/, /^\/signup/]})
+);
 
 // app.use(Formidable());
 app.use(router.routes());
