@@ -45,4 +45,4 @@ async function login(ctx) {
 module.exports = {
   login,
   signup,
-}
+};

@@ -61,6 +61,8 @@ async function updateClass(ctx) {
 
 module.exports = {
   addCourse,
+  removeCourse,
+  updateCourse,
   getCoursesList,
   addClass,
   removeClass,
