@@ -75,6 +75,48 @@ async function addCourse(courseInfo) {
 
 /**
  *
+ * @param { username: string, course: string } courseInfo
+ */
+async function removeCourse(courseInfo) {
+  const { username, course } = courseInfo;
+  const res = await findOneAndUpdate(
+    {
+      username,
+    },
+    {
+      $pull: {
+        courseList: {
+          course,
+        },
+      },
+    }
+  );
+  return res;
+}
+
+
+/**
+ *
+ * @param { username: string, course: string, newVal: { course: string }} courseInfo
+ */
+async function updateCourse(courseInfo) {
+  const { username, course, newVal } = courseInfo;
+  const res = await findOneAndUpdate(
+    {
+      username,
+      'courseList.course': course,
+    },
+    {
+      $set: {
+        'courseList.$.course': newVal.course,
+      },
+    }
+  );
+  return res;
+}
+
+/**
+ *
  * @param {username: string} query
  * @returns
  */
@@ -84,17 +126,12 @@ async function getCoursesList(query) {
   return courseList;
 }
 
+/**
+ *
+ * @param { username: string, course: string, className: string } classInfo
+ */
 async function addClass(classInfo) {
   const { username, course, className } = classInfo;
-  // const record = await findOne({ username});
-  // for (let courseItem of record.courseList) {
-  //   if (courseItem.course === course) {
-  //     console.log(courseItem);
-  //     courseItem.classes.push({ className });
-  //     break;
-  //   }
-  // }
-  // const res = await record.save();
   const res = await Course.findOneAndUpdate(
     {
       username,
@@ -112,9 +149,13 @@ async function addClass(classInfo) {
   console.log('add class', res);
 }
 
+/**
+ *
+ * @param { username: string, course: string, className: string } classInfo
+ */
 async function removeClass(classInfo) {
   const { username, course, className } = classInfo;
-  const res = await Course.findOneAndUpdate(
+  const res = await findOneAndUpdate(
     {
       username,
       'courseList.course': course,
@@ -123,12 +164,40 @@ async function removeClass(classInfo) {
       $pull: {
         'courseList.$.classes': { className },
       }
-    },
-    {
-      new: true,
     }
   );
   console.log('remove class', res);
+}
+
+/**
+ *
+ * @param { username: string, course: string, className: string, newVal: { className: string }} classInfo
+ */
+async function updateClass(classInfo) {
+  const { username, course, className, newVal } = classInfo;
+  const res = await findOneAndUpdate(
+    {
+      username,
+      'courseList.course': course,
+    },
+    {
+      $set: {
+        'courseList.$[a].classes.$[b].className': newVal.className,
+      },
+    },
+    {
+      arrayFilters: [
+        {
+          'a.course': course,
+        },
+        {
+          'b.className': className
+        }
+      ],
+      new: true,
+    }
+  );
+  return res;
 }
 
 // 查找
@@ -138,6 +207,15 @@ async function findOne(query, projection = {}, options = { lean: false }) {
   return res;
 }
 
+async function findOneAndUpdate(condition, update, options = { new: true} ) {
+  if ( typeof condition === 'string') {
+    condition = {
+      username: condition,
+    };
+  }
+  const res = await Course.findOneAndUpdate(condition, update, options);
+  return res;
+}
 // async function find(query, projection = {}) {
 //   const res = await Course.find(query, projection);
 //   console.log('find', res);
@@ -147,7 +225,10 @@ async function findOne(query, projection = {}, options = { lean: false }) {
 
 module.exports = {
   addCourse,
+  removeCourse,
+  updateCourse,
   getCoursesList,
   addClass,
   removeClass,
+  updateClass,
 };

@@ -32,7 +32,7 @@ To change the account information, only for password currently
 ```json
 {
     "username": string,
-    "new" :{
+    "newVal" :{
         "password": string,
     }
 }
@@ -61,7 +61,7 @@ To add a course to the courses list of current user
 }
 ```
 
-### /courses/delete POST
+### /courses/remove POST
 删除当前用户的课程
 To remove a course from the courses list of current user
 ```json
@@ -75,7 +75,7 @@ To change the name of a course
 ```json
 {
     "course": string,
-    "new": {
+    "newVal": {
         "course": string,
     }
 }
@@ -90,7 +90,7 @@ To add a class to a course
 }
 ```
 
-### /courses/class/delete POST
+### /courses/class/remove POST
 从某个课程的班级中删除某个班级
 To remove a class from the related classes list of a course
 ```json
@@ -107,7 +107,7 @@ To update the information of a class, including changing the name of the class
 {
     "course": string,
     "className": string,
-    "new": {
+    "newVal": {
 	"className": string,
     }
 }

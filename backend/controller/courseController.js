@@ -20,6 +20,18 @@ async function addCourse(ctx) {
   });
 }
 
+async function removeCourse(ctx) {
+  const { username } = ctx.state.user;
+  const { course } = ctx.request.body;
+  await courseDA.removeCourse({ username, course });
+}
+
+async function updateCourse(ctx) {
+  const { username } = ctx.state.user;
+  const courseInfo = ctx.request.body;
+  await courseDA.updateCourse({ username, courseInfo });
+}
+
 async function getCoursesList(ctx) {
   const { username } = ctx.state.user;
   const courseList  =  await courseDA.getCoursesList({ username });
@@ -33,8 +45,24 @@ async function addClass(ctx) {
   setStatus(ctx, 200);
 }
 
+async function removeClass(ctx) {
+  const { username } = ctx.state.user;
+  const { course, className } = ctx.request.body;
+  await courseDA.removeClass({ username, course, className });
+  setStatus(ctx, 200, 'remove class success');
+}
+
+async function updateClass(ctx) {
+  const { username } = ctx.state.user;
+  const updateInfo = ctx.request.body;
+  await courseDA.updateClass({ username, ...updateInfo });
+  setStatus(ctx, 200, 'update class success');
+}
+
 module.exports = {
   addCourse,
   getCoursesList,
   addClass,
+  removeClass,
+  updateClass,
 };
