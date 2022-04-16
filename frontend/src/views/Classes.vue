@@ -8,7 +8,11 @@
     </a-card>
     <a-card class="tree-container" title="课程与班级">
       <template #extra>
-        <a-button v-if="manageable" type="link" @click="handleAddCourse">
+        <a-button
+          v-if="manageable"
+          type="link"
+          @click="handleAdd(AddType.COURSE)"
+        >
           添加课程
         </a-button>
         <a-switch
@@ -38,20 +42,22 @@
           </div>
           <div v-else>
             <span class="parent-node">{{ title }}</span>
-            <PlusOutlined v-show="manageable" class="icon" />
+            <PlusOutlined
+              v-show="manageable"
+              class="icon"
+              @click="handleAdd(AddType.CLASS, title)"
+            />
           </div>
         </template>
       </a-tree>
     </a-card>
-    <a-modal v-model:visible="isAddCourse" @ok="addCourse">
-      <a-input
-        v-model:value="addCourseInput"
-        show-count
-        :maxlength="20"
-        @press-enter="addCourse"
-      />
-      <label v-show="addFailed" style="font: red">{{ failedMessage }}</label>
-    </a-modal>
+    <add-modal
+      ref="addModal"
+      :title="isAddCourse === AddType.COURSE ? '新增课程' : '新建班级'"
+      :visible="showModal"
+      @submit="addSubmit"
+      @close="closeModal"
+    ></add-modal>
     <common-footer :show="manageable">
       <a-button type="link" danger>删除</a-button>
     </common-footer>
@@ -62,21 +68,28 @@
 import { computed, defineComponent, ref, Ref } from 'vue';
 import { Router, useRouter } from 'vue-router';
 import { EditOutlined, PlusOutlined } from '@ant-design/icons-vue';
+import AddModal from '/@/components/Classes/AddModal.vue';
 import CommonFooter from '/@/components/common/Footer.vue';
 import type { TreeProps } from 'ant-design-vue';
 import { DataNode } from 'ant-design-vue/lib/tree';
-import { CoursesListApi, CoursesAddApi } from '/@/api/course';
+import { CoursesListApi, CoursesAddApi, ClassAddApi } from '/@/api/course';
 import Store from '/@/store/store';
 import { CourseItem } from '../schemas';
+import { CourseListResponseItem } from '../api/schema';
 
 export default defineComponent({
   name: 'ClassesList',
   components: {
     EditOutlined,
     PlusOutlined,
+    AddModal,
     CommonFooter,
   },
   setup() {
+    enum AddType {
+      COURSE = 0,
+      CLASS = 1,
+    }
     const router: Router = useRouter();
     const checkable: Ref<boolean> = ref(false);
     const manageable: Ref<boolean> = ref(false);
@@ -140,32 +153,79 @@ export default defineComponent({
     };
 
     // 添加课程
-    const isAddCourse: Ref<boolean> = ref(false);
-    const addCourseInput: Ref<string> = ref('');
-    const addFailed: Ref<boolean> = ref(false);
-    const failedMessage: Ref<string> = ref('');
-    const handleAddCourse = () => {
-      isAddCourse.value = !isAddCourse.value;
-    };
+    const showModal: Ref<boolean> = ref(false);
+    const addModal = ref();
+    const isAddCourse: Ref<AddType> = ref(AddType.COURSE);
+    const curCourse: Ref<string> = ref('');
     // 查看新添加的课程是否已重复
-    const checkDuplicate = (): boolean => {
-      for (const record of dataSource.value) {
-        if (record.course === addCourseInput.value) {
-          return false;
-        }
+    const handleAdd = (type: AddType, course?: string) => {
+      showModal.value = true;
+      isAddCourse.value = type;
+      if (course && type === AddType.CLASS) {
+        curCourse.value = course;
+      }
+    };
+
+    const checkDuplicate = (newVal: string): boolean => {
+      switch (isAddCourse.value) {
+        case AddType.COURSE:
+          for (const record of dataSource.value) {
+            if (record.course === newVal) {
+              return false;
+            }
+          }
+          break;
+        case AddType.CLASS:
+          for (const record of dataSource.value) {
+            if (record.course === curCourse.value) {
+              for (const classItem of record.classes) {
+                if (classItem === newVal) {
+                  return false;
+                }
+              }
+            }
+          }
+          break;
       }
       return true;
     };
-    const addCourse = () => {
+
+    const addSubmit = (name: string) => {
+      switch (isAddCourse.value) {
+        case AddType.COURSE:
+          addCourse(name);
+          break;
+        case AddType.CLASS:
+          addClass(name);
+          break;
+      }
+    };
+
+    // 添加课程
+    const addCourse = (course: string) => {
       // 看名字是否重复
-      if (checkDuplicate()) {
-        CoursesAddApi({ course: addCourseInput.value }).then(() => {
-          addCourseInput.value = '';
-          isAddCourse.value = false;
+      if (checkDuplicate(course)) {
+        CoursesAddApi({ course }).then(() => {
+          showModal.value = false;
         });
       } else {
-        addFailed.value = true;
-        failedMessage.value = '课程已存在';
+        console.log(addModal.value);
+        addModal.value?.showFailedMessage(`${course}课程已存在`);
+      }
+    };
+
+    // 添加班级
+    const addClass = (className: string) => {
+      if (checkDuplicate(className)) {
+        ClassAddApi({ course: curCourse.value, className })
+          .then(() => {
+            showModal.value = false;
+          })
+          .catch((err) => {
+            addModal.value?.showFailedMessage(`${err}添加失败`);
+          });
+      } else {
+        addModal.value?.showFailedMessage('班级已存在');
       }
     };
 
@@ -176,6 +236,8 @@ export default defineComponent({
     };
 
     return {
+      addModal,
+      AddType,
       name: Store.state.username,
       checkable,
       dataSource,
@@ -186,11 +248,14 @@ export default defineComponent({
       signOut,
       // 添加课程
       isAddCourse,
-      handleAddCourse,
+      showModal,
+      closeModal: () => {
+        showModal.value = false;
+      },
+      handleAdd,
       addCourse,
-      addCourseInput,
-      addFailed,
-      failedMessage,
+      addClass,
+      addSubmit,
     };
   },
 });

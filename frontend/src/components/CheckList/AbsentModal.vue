@@ -50,7 +50,6 @@ export default defineComponent({
   emits: ['close', 'logAbsent'],
   setup(props, { emit }) {
     const formState: UnwrapRef<AbsentForm> = reactive({
-      name: props.name,
       reason: props.reason,
       ps: props.ps,
     });
@@ -74,7 +73,6 @@ export default defineComponent({
       () => props,
       (newVal, _) => {
         console.log('watch');
-        formState.name = newVal.name;
         formState.reason = newVal.reason;
         formState.ps = newVal.ps;
       },

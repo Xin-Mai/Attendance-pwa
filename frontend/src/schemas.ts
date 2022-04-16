@@ -78,8 +78,7 @@ export interface ConfirmData {
 }
 
 export interface AbsentForm {
-  name: string;
-  reason: number;
+  reason: AbsentReason;
   ps: string;
 }
 
@@ -87,8 +86,8 @@ export interface Row {
   key: string | number;
   uid: string;
   name: string;
-  status?: boolean;
-  absentDetail?: AbsentForm | null;
+  status: boolean;
+  absentDetail?: AbsentForm;
 }
 
 export enum AbsentReason {

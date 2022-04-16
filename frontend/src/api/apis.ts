@@ -5,11 +5,12 @@ enum Api {
   ACCOUNT_UPDATE = '/accout/update',
   COURSES_LIST = '/courses/list',
   COURSES_ADD = '/courses/add',
-  COURSES_DELETE = '/courses/delete',
+  COURSES_REMOVE = '/courses/remove',
   COURSES_UPDATE = '/courses/update',
   CLASS_ADD = '/courses/class/add',
-  CLASS_DELETE = '/courses/class/delete',
+  CLASS_REMOVE = '/courses/class/remove',
   CLASS_UPDATE = '/courses/class/update',
+  CLASS_ROTA = '/courses/class/rota',
   ATTEND = '/attend',
 }
 
