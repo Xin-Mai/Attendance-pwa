@@ -1,4 +1,5 @@
 const courseDA = require('../database/courses');
+const rotaDA = require('../database/rota');
 const { setStatus } = require('../common/utils');
 
 async function addCourse(ctx) {
@@ -38,6 +39,13 @@ async function getCoursesList(ctx) {
   setStatus(ctx, 200, courseList);
 }
 
+async function getClassRota(ctx) {
+  const { username } = ctx.state.user;
+  const { course, className } = ctx.request.body;
+  const rota = await rotaDA.getClassRota({ username, course, className });
+  setStatus(ctx, 200, rota);
+}
+
 async function addClass(ctx) {
   const { username } = ctx.state.user;
   const { course, className } = ctx.request.body;
@@ -64,6 +72,7 @@ module.exports = {
   removeCourse,
   updateCourse,
   getCoursesList,
+  getClassRota,
   addClass,
   removeClass,
   updateClass,

@@ -1,26 +1,12 @@
 const { mongoose } = require('./db.js');
+const rotaDA = require('./rota');
 
-const rotaSchema = new mongoose.Schema({
-  uid: {
-    type: String,
-    required: true,
-  },
-  name: {
-    type: String,
-    required: true,
-  }
-});
-
-const classSchema = new mongoose.Schema({
-  className: {
-    type: String,
-    required: true,
-  },
-  rota: {
-    type: [rotaSchema],
-    default: [],
-  }
-});
+// const classSchema = new mongoose.Schema({
+//   className: {
+//     type: String,
+//     required: true,
+//   }
+// });
 
 const courseItemSchema = new mongoose.Schema({
   course: {
@@ -28,7 +14,7 @@ const courseItemSchema = new mongoose.Schema({
     required: true,
   },
   classes: {
-    type: [classSchema],
+    type: [String],
     default: [],
   }
 });
@@ -139,13 +125,14 @@ async function addClass(classInfo) {
     },
     {
       $push: {
-        'courseList.$.classes': { className },
+        'courseList.$.classes': className,
       }
     },
     {
       new: true,
     }
   );
+  await rotaDA.addRota({ username, course, className });
   console.log('add class', res);
 }
 
@@ -162,10 +149,11 @@ async function removeClass(classInfo) {
     },
     {
       $pull: {
-        'courseList.$.classes': { className },
+        'courseList.$.classes': className,
       }
     }
   );
+  await rotaDA.removeRota({ username, course, className });
   console.log('remove class', res);
 }
 
@@ -182,7 +170,7 @@ async function updateClass(classInfo) {
     },
     {
       $set: {
-        'courseList.$[a].classes.$[b].className': newVal.className,
+        'courseList.$[a].classes.$[b]': newVal.className,
       },
     },
     {
@@ -191,12 +179,13 @@ async function updateClass(classInfo) {
           'a.course': course,
         },
         {
-          'b.className': className
+          'b': className
         }
       ],
       new: true,
     }
   );
+  await rotaDA.updateRota({ username, course, className }, newVal);
   return res;
 }
 

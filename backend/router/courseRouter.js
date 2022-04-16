@@ -20,6 +20,10 @@ router.post('courseUpdate', '/courses/update', async (ctx) => {
   await courseController.updateCourse(ctx);
 });
 
+router.post('classRota', '/courses/class/rota', async (ctx) => {
+  await courseController.getClassRota(ctx);
+});
+
 router.post('classAdd', '/courses/class/add', async (ctx) => {
   await courseController.addClass(ctx);
 });
