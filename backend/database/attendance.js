@@ -72,10 +72,11 @@ async function getHistory(attendInfo) {
   const documents = await Attendance.find(attendInfo, { _id: 0 }, { lean: true });
   const history = documents.reduce((val, cur) => {
     const { present, presentPercent } = getPresent(cur.records);
+    console.log(cur.date, Object.prototype.toString.apply(cur.date));
     val.push({
-      date: cur.date,
+      date: cur.date.toISOString().substring(0, 10),
       present,
-      presentPercent,
+      presentPercent: presentPercent.toFixed(2),
     });
     return val;
   }, []);
@@ -114,7 +115,7 @@ async function getRecord(recordInfo) {
   return records;
 }
 
-// getHistory({ username: 'xin', className: '1806', course: '软件工程'});
+getHistory({ username: 'xin', className: '1806', course: '软件工程'});
 // getRecord({ username: 'xin', className: '1806', course: '软件工程', date: '2022-04-16T14:28:34.421Z'});
 module.exports = {
   addAttendance,

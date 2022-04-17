@@ -107,7 +107,7 @@ async function updateCourse(courseInfo) {
  * @returns
  */
 async function getCoursesList(query) {
-  const { courseList } = await findOne(query, { _id: 0, __v: 0 }, { lean: true });
+  const { courseList } = await findOne(query, { _id: 0, __v: 0, 'courseList._id': 0 }, { lean: true });
   console.log('get list', courseList);
   return courseList;
 }
