@@ -11,6 +11,7 @@ import Test from '../views/ClassHomePage.vue';
 import ClassesList from '../views/Classes.vue';
 import Store from '/@/store/store';
 import ClassHomePageVue from '../views/ClassHomePage.vue';
+import AttendanceRecord from '../views/AttendanceRecord.vue';
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
@@ -37,6 +38,12 @@ const routes: Array<RouteRecordRaw> = [
     path: '/classHomePage/:course/:className',
     name: 'classHomePage',
     component: ClassHomePageVue,
+    props: true,
+  },
+  {
+    path: '/records/:course/:className',
+    name: 'attendanceRecord',
+    component: AttendanceRecord,
     props: true,
   },
   {

@@ -29,6 +29,7 @@
         :course="course"
         :class-name="className"
       />
+      <statistical-chart v-else :course="course" :class-name="className" />
     </a-card>
   </div>
 </template>
@@ -40,6 +41,7 @@ import { CarryOutOutlined } from '@ant-design/icons-vue';
 import CommonHeader from '/@/components/common/Header.vue';
 import RotaTable from '/@/components/ClassHomePage/RotaTable.vue';
 import AttendanceHistory from '/@/components/ClassHomePage/AttendanceHistory.vue';
+import StatisticalChart from '/@/components/ClassHomePage/StatisticalChart.vue';
 import Store from '/@/store/store';
 
 export default defineComponent({
@@ -49,6 +51,7 @@ export default defineComponent({
     CommonHeader,
     RotaTable,
     AttendanceHistory,
+    StatisticalChart,
   },
   props: {
     className: {

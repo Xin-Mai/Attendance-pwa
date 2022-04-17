@@ -1,5 +1,10 @@
 <template>
-  <a-table :columns="columns" :data-source="dataSource" :loading="loading">
+  <a-table
+    :columns="columns"
+    :data-source="dataSource"
+    :loading="loading"
+    :pagination="false"
+  >
     <template #bodyCell="{ column, record }">
       <template v-if="column.key === 'action'">
         <a @click="toDetail(record)">点击查看</a>
@@ -13,7 +18,7 @@ import { defineComponent, Ref, ref } from 'vue';
 import { AttendanceRecord, AttendanceResponseInfo } from '/@/api/schema';
 import type { TableColumnsType } from 'ant-design-vue';
 import { useRouter, Router } from 'vue-router';
-import { AttendHistory, AttendHistoryApi } from '/@/api/attend';
+import { AttendHistoryApi } from '/@/api/attend';
 
 export default defineComponent({
   name: 'AttendanceHistory',
@@ -62,7 +67,14 @@ export default defineComponent({
       }
     );
     const toDetail = (record: AttendanceResponseInfo) => {
-      // router.push({ name: '' });
+      router.push({
+        name: 'attendaceRecord',
+        params: {
+          course: props.course,
+          className: props.className,
+          date: record.date,
+        },
+      });
     };
 
     return {
