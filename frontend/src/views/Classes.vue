@@ -143,7 +143,8 @@ export default defineComponent({
       console.log(arr);
       if (!arr || arr.length < 2) return;
       router.push({
-        name: 'check',
+        // name: 'check',
+        name: 'classHomePage',
         params: {
           course: dataSource.value[parseInt(arr[0])].course,
           className:

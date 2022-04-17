@@ -31,3 +31,15 @@ export interface AttendanceRequest {
   className: string;
   records: AttendanceRecord[];
 }
+
+export interface AttendanceResponseInfo {
+  date: Date;
+  present: number;
+  presentPercent: number;
+}
+
+export interface AttendanceRecordRequest {
+  course: string;
+  className: string;
+  date: string;
+}

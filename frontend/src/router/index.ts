@@ -7,9 +7,10 @@ import {
 } from 'vue-router';
 import CheckList from '../views/CheckList.vue';
 import Login from '../views/Login.vue';
-import Test from '../views/Test.vue';
+import Test from '../views/ClassHomePage.vue';
 import ClassesList from '../views/Classes.vue';
 import Store from '/@/store/store';
+import ClassHomePageVue from '../views/ClassHomePage.vue';
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
@@ -33,9 +34,16 @@ const routes: Array<RouteRecordRaw> = [
     component: ClassesList,
   },
   {
-    path: '/test',
+    path: '/classHomePage/:course/:className',
+    name: 'classHomePage',
+    component: ClassHomePageVue,
+    props: true,
+  },
+  {
+    path: '/test/:course/:className',
     name: 'test',
     component: Test,
+    props: true,
   },
 ];
 

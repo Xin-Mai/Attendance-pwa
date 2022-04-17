@@ -11,7 +11,9 @@ enum Api {
   CLASS_REMOVE = '/courses/class/remove',
   CLASS_UPDATE = '/courses/class/update',
   CLASS_ROTA = '/courses/class/rota',
-  ATTEND = '/attend',
+  ATTEND_ADD = '/attend/add',
+  ATTEND_HISTORY = '/attend/history',
+  ATTEND_RECORD = '/attend/record',
 }
 
 export default Api;
