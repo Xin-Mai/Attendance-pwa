@@ -4,8 +4,16 @@ const AttendanceController = require('../controller/attendanceController');
 
 const router = new Router();
 
-router.post('attend', '/attend', async (ctx) => {
+router.post('attend', '/attend/add', async (ctx) => {
   await AttendanceController.attend(ctx);
+});
+
+router.post('attendHistory', '/attend/history', async (ctx) => {
+  await AttendanceController.getHistory(ctx);
+});
+
+router.post('attendRecord', '/attend/record', async (ctx) => {
+  await AttendanceController.getRecord(ctx);
 });
 
 module.exports = router;
