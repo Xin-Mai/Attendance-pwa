@@ -74,7 +74,7 @@ async function getHistory(attendInfo) {
     const { present, presentPercent } = getPresent(cur.records);
     console.log(cur.date, Object.prototype.toString.apply(cur.date));
     val.push({
-      date: cur.date.toISOString().substring(0, 10),
+      date: cur.date.toISOString(),
       present,
       presentPercent: presentPercent.toFixed(2),
     });
@@ -115,7 +115,7 @@ async function getRecord(recordInfo) {
   return records;
 }
 
-getHistory({ username: 'xin', className: '1806', course: '软件工程'});
+// getHistory({ username: 'xin', className: '1806', course: '软件工程'});
 // getRecord({ username: 'xin', className: '1806', course: '软件工程', date: '2022-04-16T14:28:34.421Z'});
 module.exports = {
   addAttendance,

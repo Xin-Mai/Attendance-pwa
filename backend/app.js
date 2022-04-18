@@ -16,6 +16,23 @@ app.use(BodyPraser());
 //   }
 // })
 
+// Custom 401 handling if you don't want to expose koa-jwt errors to users
+app.use(function(ctx, next){
+  return next().catch((err) => {
+    if (401 == err.statusCode ) {// token 失效
+      ctx.code = 401;
+      ctx.body = {
+        code:401,
+        data:null,
+        message:'\'token 失效请重新登录'
+      };
+    } else {
+      throw err;
+    }
+    console.log(ctx.request);
+  });
+});
+
 app.use(
   jwt({
     secret: ENCRYPTION_KEY,
