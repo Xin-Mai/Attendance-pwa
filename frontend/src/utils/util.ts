@@ -1,7 +1,7 @@
 export function formatter(date: Date, format: string): string {
   const o = {
     'y+': date.getFullYear(),
-    'M+': date.getMonth(),
+    'M+': date.getMonth() + 1,
     'd+': date.getDate(),
     'h+': date.getHours(),
     'm+': date.getMinutes(),
@@ -22,4 +22,10 @@ export function formatter(date: Date, format: string): string {
   }
 
   return format;
+}
+
+export function ISOSformatter(ISOSdate: string) {
+  const date: Date = new Date(ISOSdate);
+  date.setHours(date.getHours() + 8);
+  return date.toISOString().substring(0, 16).replace('T', ' ');
 }

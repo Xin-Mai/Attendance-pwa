@@ -2,8 +2,11 @@
   <common-header title="班级" :backable="true"></common-header>
   <div class="container">
     <a-card class="header">
-      <h1 class="header-text">{{ className }}</h1>
-      <label>{{ count }}人</label>
+      <h1 class="header-text">{{ className }}班</h1>
+      <div>
+        <label>{{ course }}</label>
+        <label style="margin-left: 10px">{{ count }}人</label>
+      </div>
     </a-card>
     <a-card
       class="tabCard"
@@ -11,25 +14,27 @@
       :active-tab-key="activeKey"
       @tab-change="onTabChange"
     >
-      <a-card-grid
-        v-if="activeKey === 'check'"
-        style="text-align: center"
-        @click="toCheck"
-      >
-        <CarryOutOutlined />
-        考勤
-      </a-card-grid>
-      <rota-table
-        v-else-if="activeKey === 'rota'"
-        :course="course"
-        :class-name="className"
-      />
-      <attendance-history
-        v-else-if="activeKey === 'history'"
-        :course="course"
-        :class-name="className"
-      />
-      <statistical-chart v-else :course="course" :class-name="className" />
+      <keep-alive>
+        <a-card-grid
+          v-if="activeKey === 'check'"
+          style="text-align: center"
+          @click="toCheck"
+        >
+          <CarryOutOutlined />
+          考勤
+        </a-card-grid>
+        <rota-table
+          v-else-if="activeKey === 'rota'"
+          :course="course"
+          :class-name="className"
+        />
+        <attendance-history
+          v-else-if="activeKey === 'history'"
+          :course="course"
+          :class-name="className"
+        />
+        <statistical-chart v-else :course="course" :class-name="className" />
+      </keep-alive>
     </a-card>
   </div>
 </template>
@@ -37,6 +42,10 @@
 <script lang="ts">
 import { defineComponent, ref, Ref } from 'vue';
 import { Router, useRouter } from 'vue-router';
+
+import { ClassRotaApi } from '/@/api/course';
+import { RotaResponseItem } from '/@/api/schema';
+
 import { CarryOutOutlined } from '@ant-design/icons-vue';
 import CommonHeader from '/@/components/common/Header.vue';
 import RotaTable from '/@/components/ClassHomePage/RotaTable.vue';
@@ -87,6 +96,13 @@ export default defineComponent({
       },
     ];
 
+    // 请求名册数据
+    ClassRotaApi({ course: props.course, className: props.className }).then(
+      (rota) => {
+        count.value = (rota as unknown as RotaResponseItem[]).length;
+      }
+    );
+
     const onTabChange = (key: string) => {
       activeKey.value = key;
       console.log(key);
@@ -117,7 +133,8 @@ export default defineComponent({
 <style scoped>
 .container {
   width: 100%;
-  height: 100%;
+  height: auto;
+  min-height: 100%;
   padding: 1rem;
   background-color: #eeeeee;
   display: flex;

@@ -6,8 +6,14 @@
     :pagination="false"
   >
     <template #bodyCell="{ column, record }">
+      <template v-if="column.key === 'date'">
+        <span>{{ ISOSformatter(record.date) }}</span>
+      </template>
       <template v-if="column.key === 'action'">
-        <a @click="toDetail(record)">点击查看</a>
+        <a @click="toDetail(record)">查看</a>
+      </template>
+      <template v-else-if="column.key === 'presentPercent'">
+        <span>{{ record.presentPercent * 100 }}%</span>
       </template>
     </template>
   </a-table>
@@ -19,6 +25,7 @@ import { AttendanceRecord, AttendanceResponseInfo } from '/@/api/schema';
 import type { TableColumnsType } from 'ant-design-vue';
 import { useRouter, Router } from 'vue-router';
 import { AttendHistoryApi } from '/@/api/attend';
+import { ISOSformatter } from '/@/utils/util';
 
 export default defineComponent({
   name: 'AttendanceHistory',
@@ -68,7 +75,7 @@ export default defineComponent({
     );
     const toDetail = (record: AttendanceResponseInfo) => {
       router.push({
-        name: 'attendaceRecord',
+        name: 'attendanceRecord',
         params: {
           course: props.course,
           className: props.className,
@@ -82,6 +89,7 @@ export default defineComponent({
       dataSource,
       loading,
       toDetail,
+      ISOSformatter,
     };
   },
 });

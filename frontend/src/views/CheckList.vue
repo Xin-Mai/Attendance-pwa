@@ -165,7 +165,13 @@ export default defineComponent({
         records: data.value,
       });
       closeConfirmModal();
-      router.push({ name: 'home' });
+      router.push({
+        name: 'classHomePage',
+        params: {
+          course: props.course,
+          className: props.className,
+        },
+      });
     };
 
     // 将没有选择缺勤原因的默认为请假

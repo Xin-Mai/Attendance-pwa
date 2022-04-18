@@ -95,3 +95,5 @@ export enum AbsentReason {
   NO_REASON = 1,
   ELSE = 2,
 }
+
+export const ReasonArray: string[] = ['请假', '无故缺勤', '其他'];

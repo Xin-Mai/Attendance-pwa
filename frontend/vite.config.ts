@@ -24,6 +24,7 @@ export default ({ mode }: ConfigEnv): UserConfig => {
     },
     server: {
       port: parseInt(env.VITE_PORT),
+      host: env.VITE_HOST,
       strictPort: false,
       https: false,
       proxy: {
@@ -33,6 +34,9 @@ export default ({ mode }: ConfigEnv): UserConfig => {
           rewrite: (path) => path.replace(/^\/api/, ''),
         },
       },
+    },
+    preview: {
+      host: env.VITE_HOST,
     },
   };
 };

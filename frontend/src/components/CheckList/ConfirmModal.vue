@@ -22,6 +22,7 @@
 import { defineComponent, reactive, UnwrapRef, watchEffect, watch } from 'vue';
 import { ConfirmRow, ConfirmData } from '/@/schemas';
 import { formatter } from '/@/utils/util';
+import Store from '/@/store/store';
 
 export default defineComponent({
   name: 'ConfirmModal',
@@ -52,7 +53,7 @@ export default defineComponent({
     // 初始化
     const dataSource: UnwrapRef<ConfirmData> = reactive({
       date: formatter(new Date(), 'yyyy年MM月dd日 hh:mm'),
-      teacher: '陈长清',
+      teacher: Store.state.username,
       course: props.course,
       className: props.className,
       present: 0,

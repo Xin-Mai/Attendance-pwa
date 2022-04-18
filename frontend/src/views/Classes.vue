@@ -22,9 +22,10 @@
         />
       </template>
       <a-tree
+        v-if="treeData.length"
         :checkable="manageable"
         :auto-expand-parent="true"
-        :default-expand-all="true"
+        default-expand-all
         :tree-data="treeData"
         :selectable="true"
       >
@@ -106,9 +107,12 @@ export default defineComponent({
     // ];
     const dataSource: Ref<CourseItem[]> = ref([]);
     // const data: CoursesList = await
-    CoursesListApi().then((val) => {
-      dataSource.value = val as unknown as CourseItem[];
-    });
+    const getData = () => {
+      CoursesListApi().then((val) => {
+        dataSource.value = val as unknown as CourseItem[];
+      });
+    };
+    getData();
     // 处理数据
     const treeData = computed(() => {
       const treeArr: TreeProps['treeData'] = [];
@@ -139,7 +143,7 @@ export default defineComponent({
 
     // 跳转到考勤页面
     const checkPresent = (key: string) => {
-      const arr: string[] | null = /([0-9]+)/.exec(key);
+      const arr: string[] | null = key.match(/([0-9]+)/g);
       console.log(arr);
       if (!arr || arr.length < 2) return;
       router.push({
@@ -191,24 +195,24 @@ export default defineComponent({
       return true;
     };
 
-    const addSubmit = (name: string) => {
+    const addSubmit = async (name: string) => {
       switch (isAddCourse.value) {
         case AddType.COURSE:
-          addCourse(name);
+          await addCourse(name);
           break;
         case AddType.CLASS:
-          addClass(name);
+          await addClass(name);
           break;
       }
+      getData();
     };
 
     // 添加课程
-    const addCourse = (course: string) => {
+    const addCourse = async (course: string) => {
       // 看名字是否重复
       if (checkDuplicate(course)) {
-        CoursesAddApi({ course }).then(() => {
-          showModal.value = false;
-        });
+        await CoursesAddApi({ course });
+        showModal.value = false;
       } else {
         console.log(addModal.value);
         addModal.value?.showFailedMessage(`${course}课程已存在`);
@@ -216,9 +220,9 @@ export default defineComponent({
     };
 
     // 添加班级
-    const addClass = (className: string) => {
+    const addClass = async (className: string) => {
       if (checkDuplicate(className)) {
-        ClassAddApi({ course: curCourse.value, className })
+        await ClassAddApi({ course: curCourse.value, className })
           .then(() => {
             showModal.value = false;
           })
