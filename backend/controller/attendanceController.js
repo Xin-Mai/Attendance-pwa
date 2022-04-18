@@ -6,6 +6,7 @@ async function attend(ctx) {
   const { username } = ctx.state.user;
   const date = new Date();
   await attendDA.addAttendance({ username, date, ...records });
+  setStatus(ctx, 200);
 }
 
 async function getHistory(ctx) {

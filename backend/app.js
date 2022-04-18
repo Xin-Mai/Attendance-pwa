@@ -29,7 +29,7 @@ app.use(function(ctx, next){
     } else {
       throw err;
     }
-    console.log(ctx.request);
+    console.log('401:', ctx.request.url);
   });
 });
 
