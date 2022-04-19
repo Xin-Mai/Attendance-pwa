@@ -105,7 +105,6 @@ export default defineComponent({
 
     const onTabChange = (key: string) => {
       activeKey.value = key;
-      console.log(key);
     };
 
     const toCheck = () => {

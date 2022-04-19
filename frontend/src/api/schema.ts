@@ -43,3 +43,9 @@ export interface AttendanceRecordRequest {
   className: string;
   date: string;
 }
+
+export interface RotaSetParams {
+  course: string;
+  className: string;
+  rota: RotaResponseItem[];
+}

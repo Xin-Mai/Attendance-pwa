@@ -14,6 +14,7 @@ enum Api {
   ATTEND_ADD = '/attend/add',
   ATTEND_HISTORY = '/attend/history',
   ATTEND_RECORD = '/attend/record',
+  ROTA_SET = '/rota/set',
 }
 
 export default Api;

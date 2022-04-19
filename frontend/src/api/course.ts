@@ -3,6 +3,7 @@ import {
   ClassRequestParams,
   CourseListResponseItem,
   CourseRequestParams,
+  RotaSetParams,
 } from './schema';
 import axiosInstance from '/@/utils/axios/axios';
 
@@ -34,3 +35,6 @@ export const ClassUpdateApi = (params: {
 
 export const ClassRotaApi = (params: ClassRequestParams) =>
   axiosInstance.post(Api.CLASS_ROTA, params);
+
+export const RotaSetApi = (params: RotaSetParams) =>
+  axiosInstance.post(Api.ROTA_SET, params);
