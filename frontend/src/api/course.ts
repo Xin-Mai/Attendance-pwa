@@ -1,6 +1,9 @@
-import { CourseItem } from '../schemas';
 import Api from './apis';
-import { ClassRequestParams, CourseRequestParams } from './schema';
+import {
+  ClassRequestParams,
+  CourseListResponseItem,
+  CourseRequestParams,
+} from './schema';
 import axiosInstance from '/@/utils/axios/axios';
 
 export const CoursesListApi = () => axiosInstance.get(Api.COURSES_LIST);
@@ -19,8 +22,9 @@ export const CoursesUpdateApi = (params: {
 export const ClassAddApi = (params: ClassRequestParams) =>
   axiosInstance.post(Api.CLASS_ADD, params);
 
-export const ClassRemoveApi = (params: ClassRequestParams) =>
-  axiosInstance.post(Api.CLASS_REMOVE, params);
+export const ClassRemoveApi = (
+  params: ClassRequestParams | CourseListResponseItem[]
+) => axiosInstance.post(Api.CLASS_REMOVE, params);
 
 export const ClassUpdateApi = (params: {
   course: string;

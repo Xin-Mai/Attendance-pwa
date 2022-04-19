@@ -2,6 +2,7 @@
   <a-modal
     :visible="visible"
     :title="title"
+    :confirm-loading="confirmLoading"
     ok-text="确认"
     cancel-text="取消"
     @ok="handleOK"
@@ -30,6 +31,10 @@ export default defineComponent({
     title: {
       type: String,
       default: 'Simple Modal',
+    },
+    confirmLoading: {
+      type: Boolean,
+      default: false,
     },
   },
   emits: ['submit', 'close'],

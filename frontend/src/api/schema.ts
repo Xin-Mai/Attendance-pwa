@@ -35,7 +35,7 @@ export interface AttendanceRequest {
 export interface AttendanceResponseInfo {
   date: string;
   present: number;
-  presentPercent: number;
+  presentPercent: string;
 }
 
 export interface AttendanceRecordRequest {

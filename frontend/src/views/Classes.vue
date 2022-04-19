@@ -24,10 +24,12 @@
       <a-tree
         v-if="treeData.length"
         :checkable="manageable"
+        :checked-keys="checkedKeys"
         :auto-expand-parent="true"
         default-expand-all
         :tree-data="treeData"
         :selectable="true"
+        @check="onCheck"
       >
         <template #title="{ title, key }">
           <!--是课程-->
@@ -56,11 +58,12 @@
       ref="addModal"
       :title="isAddCourse === AddType.COURSE ? '新增课程' : '新建班级'"
       :visible="showModal"
+      :confirm-loading="modalLoading"
       @submit="addSubmit"
       @close="closeModal"
     ></add-modal>
     <common-footer :show="manageable">
-      <a-button type="link" danger>删除</a-button>
+      <a-button type="link" danger @click="removeClass">删除班级</a-button>
     </common-footer>
   </div>
 </template>
@@ -68,15 +71,26 @@
 <script lang="ts">
 import { computed, defineComponent, ref, Ref } from 'vue';
 import { Router, useRouter } from 'vue-router';
+
+import { Modal } from 'ant-design-vue';
 import { EditOutlined, PlusOutlined } from '@ant-design/icons-vue';
 import AddModal from '/@/components/Classes/AddModal.vue';
 import CommonFooter from '/@/components/common/Footer.vue';
+
 import type { TreeProps } from 'ant-design-vue';
 import { DataNode } from 'ant-design-vue/lib/tree';
-import { CoursesListApi, CoursesAddApi, ClassAddApi } from '/@/api/course';
+
+import {
+  CoursesListApi,
+  CoursesAddApi,
+  ClassAddApi,
+  ClassRemoveApi,
+} from '/@/api/course';
+
 import Store from '/@/store/store';
-import { CourseItem } from '../schemas';
+// import { CourseItem } from '../schemas';
 import { CourseListResponseItem } from '../api/schema';
+import { signOut } from '/@/utils/redirect';
 
 export default defineComponent({
   name: 'ClassesList',
@@ -87,12 +101,13 @@ export default defineComponent({
     CommonFooter,
   },
   setup() {
+    const router: Router = useRouter();
     enum AddType {
       COURSE = 0,
       CLASS = 1,
     }
-    const router: Router = useRouter();
     const checkable: Ref<boolean> = ref(false);
+    const checkedKeys: Ref<string[]> = ref([]);
     const manageable: Ref<boolean> = ref(false);
     // 模拟的数据
     // const data: CourseItem[] = [
@@ -105,11 +120,11 @@ export default defineComponent({
     //     classes: [],
     //   },
     // ];
-    const dataSource: Ref<CourseItem[]> = ref([]);
+    const dataSource: Ref<CourseListResponseItem[]> = ref([]);
     // const data: CoursesList = await
     const getData = () => {
       CoursesListApi().then((val) => {
-        dataSource.value = val as unknown as CourseItem[];
+        dataSource.value = val as unknown as CourseListResponseItem[];
       });
     };
     getData();
@@ -140,11 +155,14 @@ export default defineComponent({
     const manage = (key) => {
       console.log('manage:', key);
     };
+    // 选中节点
+    const onCheck = (keys: string[]) => {
+      checkedKeys.value = keys;
+    };
 
     // 跳转到考勤页面
     const checkPresent = (key: string) => {
       const arr: string[] | null = key.match(/([0-9]+)/g);
-      console.log(arr);
       if (!arr || arr.length < 2) return;
       router.push({
         // name: 'check',
@@ -159,6 +177,7 @@ export default defineComponent({
 
     // 添加课程
     const showModal: Ref<boolean> = ref(false);
+    const modalLoading: Ref<boolean> = ref(false);
     const addModal = ref();
     const isAddCourse: Ref<AddType> = ref(AddType.COURSE);
     const curCourse: Ref<string> = ref('');
@@ -196,15 +215,24 @@ export default defineComponent({
     };
 
     const addSubmit = async (name: string) => {
-      switch (isAddCourse.value) {
-        case AddType.COURSE:
-          await addCourse(name);
-          break;
-        case AddType.CLASS:
-          await addClass(name);
-          break;
+      modalLoading.value = true;
+      try {
+        switch (isAddCourse.value) {
+          case AddType.COURSE:
+            await addCourse(name);
+            break;
+          case AddType.CLASS:
+            await addClass(name);
+            break;
+        }
+        modalLoading.value = false;
+        showModal.value = false;
+        addModal.value?.clear();
+        getData();
+      } catch (err) {
+        modalLoading.value = false;
+        addModal.value?.showFailedMessage(`${err} 添加失败`);
       }
-      getData();
     };
 
     // 添加课程
@@ -214,38 +242,84 @@ export default defineComponent({
         await CoursesAddApi({ course });
         showModal.value = false;
       } else {
-        console.log(addModal.value);
-        addModal.value?.showFailedMessage(`${course}课程已存在`);
+        throw `${course}课程已存在`;
       }
     };
 
     // 添加班级
     const addClass = async (className: string) => {
       if (checkDuplicate(className)) {
-        await ClassAddApi({ course: curCourse.value, className })
-          .then(() => {
-            showModal.value = false;
-          })
-          .catch((err) => {
-            addModal.value?.showFailedMessage(`${err}添加失败`);
-          });
+        await ClassAddApi({ course: curCourse.value, className });
       } else {
-        addModal.value?.showFailedMessage('班级已存在');
+        throw '班级已存在';
       }
     };
 
-    // 登出
-    const signOut = () => {
-      Store.action.signOut();
-      router.push({ name: 'login' });
+    // 删除班级
+    const filterRemoveParams = (): CourseListResponseItem[] => {
+      const selected: string[] = checkedKeys.value;
+      const paramsMap: Map<string, CourseListResponseItem> = new Map();
+      for (const key of selected) {
+        const index: string[] | null = key.match(/([0-9]+)/g);
+        if (!index || index.length < 2) continue;
+        const val = paramsMap.get(index[0]);
+        if (val) {
+          val.classes.push(
+            dataSource.value[parseInt(index[0])].classes[parseInt(index[1])]
+          );
+        } else {
+          const course = dataSource.value[parseInt(index[0])].course;
+          const className =
+            dataSource.value[parseInt(index[0])].classes[parseInt(index[1])];
+          paramsMap.set(index[0], { course, classes: [className] });
+        }
+      }
+      return Array.from(paramsMap.values());
     };
+
+    const removeClass = () => {
+      const params = filterRemoveParams();
+      showConfirm(params);
+    };
+
+    function showConfirm(params: CourseListResponseItem[]) {
+      if (params.length === 0) {
+        Modal.info({
+          title: '请至少选择一个需要删除的班级',
+          okText: '确认',
+          cancelText: '取消',
+        });
+      } else {
+        const content: string = params.reduce(
+          (val, cur) => `${val} ${cur.course}：${cur.classes.toString()}`,
+          ''
+        );
+        Modal.confirm({
+          title: '确认删除下列班级?',
+          content,
+          okText: '确认',
+          cancelText: '取消',
+          async onOk() {
+            try {
+              // 发送删除请求
+              await ClassRemoveApi(params);
+              getData();
+            } catch {
+              return console.log('Oops errors!');
+            }
+          },
+          onCancel() {},
+        });
+      }
+    }
 
     return {
       addModal,
       AddType,
       name: Store.state.username,
       checkable,
-      dataSource,
+      checkedKeys,
+      onCheck,
       treeData,
       manage,
       manageable,
@@ -254,6 +328,7 @@ export default defineComponent({
       // 添加课程
       isAddCourse,
       showModal,
+      modalLoading,
       closeModal: () => {
         showModal.value = false;
       },
@@ -261,6 +336,8 @@ export default defineComponent({
       addCourse,
       addClass,
       addSubmit,
+      // 删除班级
+      removeClass,
     };
   },
 });

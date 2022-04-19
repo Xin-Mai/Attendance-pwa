@@ -1,4 +1,6 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
+import { message } from 'ant-design-vue';
+import { signOut } from '../redirect';
 
 const apiUrl = import.meta.env.VITE_API_URL
   ? (import.meta.env.VITE_API_URL as string)
@@ -17,7 +19,7 @@ const axiosInstance: AxiosInstance = axios.create({
 //请求拦截器
 axiosInstance.interceptors.request.use(
   (config: AxiosRequestConfig) => {
-    console.log('axios sending request', config);
+    // console.log('axios sending request', config);
     return config;
   },
   (error: any) => {
@@ -33,45 +35,46 @@ axiosInstance.interceptors.response.use(
   },
   (error: any) => {
     // 对响应错误做点什么
-    console.log('get error', error);
+    console.log('get error', error.response, error.response.status);
     if (error.response && error.response.status) {
       const status: number = error.response.status;
-      let message: string | null = null;
+      let errMessage: string | null = null;
       switch (status) {
         case 400:
-          message = '请求错误';
+          errMessage = '请求错误';
           break;
         case 401:
-          message = '请求错误';
+          signOut();
+          errMessage = '没有权限';
           break;
         case 404:
-          message = '请求地址出错';
+          errMessage = '请求地址出错';
           break;
         case 408:
-          message = '请求超时';
+          errMessage = '请求超时';
           break;
         case 500:
-          message = '服务器内部错误!';
+          errMessage = '服务器内部错误!';
           break;
         case 501:
-          message = '服务未实现!';
+          errMessage = '服务未实现!';
           break;
         case 502:
-          message = '网关错误!';
+          errMessage = '网关错误!';
           break;
         case 503:
-          message = '服务不可用!';
+          errMessage = '服务不可用!';
           break;
         case 504:
-          message = '网关超时!';
+          errMessage = '网关超时!';
           break;
         case 505:
-          message = 'HTTP版本不受支持';
+          errMessage = 'HTTP版本不受支持';
           break;
         default:
-          message = '请求失败';
-          console.log(message);
+          errMessage = '请求失败';
       }
+      message.warning(errMessage);
     }
     return Promise.reject(error);
   }

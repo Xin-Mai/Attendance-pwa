@@ -3,6 +3,7 @@ const jwt = require('koa-jwt');
 const BodyPraser = require('koa-bodyparser');
 const router = require('./router/router');
 const { ENCRYPTION_KEY } = require('./common/cryp');
+const { setStatus } = require('./common/utils');
 
 const app = new Koa();
 
@@ -20,12 +21,7 @@ app.use(BodyPraser());
 app.use(function(ctx, next){
   return next().catch((err) => {
     if (401 == err.statusCode ) {// token 失效
-      ctx.code = 401;
-      ctx.body = {
-        code:401,
-        data:null,
-        message:'\'token 失效请重新登录'
-      };
+      setStatus(ctx, 401, null, '\'token 失效请重新登录');
     } else {
       throw err;
     }
