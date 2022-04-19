@@ -90,7 +90,7 @@ export default defineComponent({
           rota,
         });
         failed.value = false;
-        emit('sbumit');
+        emit('submit');
       } catch (err) {
         failed.value = true;
         failedMessage.value = err;

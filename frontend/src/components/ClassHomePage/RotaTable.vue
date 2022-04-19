@@ -40,7 +40,8 @@ export default defineComponent({
       required: true,
     },
   },
-  setup(props) {
+  emits: ['update'],
+  setup(props, { emit }) {
     const loading: Ref<boolean> = ref(true);
     const dataSource: Ref<RotaResponseItem[]> = ref([]);
     const modalVisible: Ref<boolean> = ref(false);
@@ -67,11 +68,16 @@ export default defineComponent({
         (rota) => {
           dataSource.value = rota as unknown as RotaResponseItem[];
           loading.value = false;
+          emit('update', dataSource.value.length);
         }
       );
     }
 
     getRota();
+
+    const closeModal = () => {
+      modalVisible.value = false;
+    };
 
     return {
       loading,
@@ -81,10 +87,9 @@ export default defineComponent({
       showUploadModal: () => {
         modalVisible.value = true;
       },
-      closeModal: () => {
-        modalVisible.value = false;
-      },
+      closeModal,
       newRotaSubmit: () => {
+        closeModal();
         getRota();
       },
     };

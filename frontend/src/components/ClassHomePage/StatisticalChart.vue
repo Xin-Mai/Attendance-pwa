@@ -108,8 +108,12 @@ export default defineComponent({
       (newVal) => {
         setOptions(newVal);
         average.value =
-          newVal.reduce((val, cur) => val + parseFloat(cur.presentPercent), 0) /
-          newVal.length;
+          newVal.length === 0
+            ? 0
+            : newVal.reduce(
+                (val, cur) => val + parseFloat(cur.presentPercent),
+                0
+              ) / newVal.length;
       }
     );
 

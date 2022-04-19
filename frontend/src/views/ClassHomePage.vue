@@ -27,6 +27,7 @@
           v-else-if="activeKey === 'rota'"
           :course="course"
           :class-name="className"
+          @update="updateCount"
         />
         <attendance-history
           v-else-if="activeKey === 'history'"
@@ -124,6 +125,9 @@ export default defineComponent({
       activeKey,
       onTabChange,
       toCheck,
+      updateCount: (val: number) => {
+        count.value = val;
+      },
     };
   },
 });

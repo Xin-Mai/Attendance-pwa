@@ -1,4 +1,5 @@
 <template>
+  <common-header title="主页" :backable="false"></common-header>
   <div class="container">
     <a-card class="header">
       <h1 class="header-text">{{ name }}老师，你好</h1>
@@ -75,6 +76,7 @@ import { Router, useRouter } from 'vue-router';
 import { Modal } from 'ant-design-vue';
 import { EditOutlined, PlusOutlined } from '@ant-design/icons-vue';
 import AddModal from '/@/components/Classes/AddModal.vue';
+import CommonHeader from '/@/components/common/Header.vue';
 import CommonFooter from '/@/components/common/Footer.vue';
 
 import type { TreeProps } from 'ant-design-vue';
@@ -98,6 +100,7 @@ export default defineComponent({
     EditOutlined,
     PlusOutlined,
     AddModal,
+    CommonHeader,
     CommonFooter,
   },
   setup() {
