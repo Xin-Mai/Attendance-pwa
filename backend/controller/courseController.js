@@ -46,6 +46,13 @@ async function getClassRota(ctx) {
   setStatus(ctx, 200, rota);
 }
 
+async function setRota(ctx) {
+  const { username } = ctx.state.user;
+  const { course, className, rota } = ctx.request.body;
+  await rotaDA.setRota({ username, course, className }, rota);
+  setStatus(ctx, 200);
+}
+
 async function addClass(ctx) {
   const { username } = ctx.state.user;
   const { course, className } = ctx.request.body;
@@ -78,6 +85,7 @@ module.exports = {
   updateCourse,
   getCoursesList,
   getClassRota,
+  setRota,
   addClass,
   removeClass,
   updateClass,

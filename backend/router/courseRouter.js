@@ -36,4 +36,8 @@ router.post('classUodate', '/courses/class/update', async (ctx) => {
   await courseController.updateClass(ctx);
 });
 
+router.post('setRota', '/rota/set', async (ctx) => {
+  await courseController.setRota(ctx);
+});
+
 module.exports = router;

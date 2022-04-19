@@ -57,6 +57,7 @@ async function addRota(newRota) {
   await existed.save();
 }
 
+
 /**
  *
  * @param { username: string, course: string, className: string } rotaInfo
@@ -90,6 +91,12 @@ async function removeManyRota(username, course, classes) {
   return res;
 }
 
+/**
+ *
+ * @param { username: string, course: string, className: string } rotaInfo
+ * @param { { uid: string, name: string }[] } newRota
+ * @returns
+ */
 async function setRota(rotaInfo, newRota) {
   const res = await Rota.findOneAndUpdate(
     rotaInfo,
