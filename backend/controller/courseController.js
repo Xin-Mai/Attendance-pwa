@@ -55,8 +55,13 @@ async function addClass(ctx) {
 
 async function removeClass(ctx) {
   const { username } = ctx.state.user;
-  const { course, className } = ctx.request.body;
-  await courseDA.removeClass({ username, course, className });
+  const requestBody = ctx.request.body;
+  if (requestBody instanceof Array) {
+    await courseDA.removeManyClass(username, requestBody);
+  } else {
+    const { course, className } = requestBody;
+    await courseDA.removeClass({ username, course, className });
+  }
   setStatus(ctx, 200, 'remove class success');
 }
 

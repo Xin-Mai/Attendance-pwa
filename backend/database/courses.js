@@ -75,11 +75,63 @@ async function removeCourse(courseInfo) {
           course,
         },
       },
+    },
+    {
+      new: true,
     }
   );
+  console.log('remove course', res);
   return res;
 }
 
+/**
+ *
+ * @param { string } username
+ * @param { string[] } courses
+ */
+// async function removeManyCourse(username, courses) {
+//   // const remove_id = [];
+//   const res = await Course.find(
+//     {
+//       username,
+//       'courseList.course': {
+//         $in: courses,
+//       },
+//     }
+//   );
+//   console.log(res);
+// }
+
+// removeManyClass('xin', [{course: '软件工程', classes: ['1807']}]);
+
+/**
+ *
+ * @param { string } username
+ * @param { { course: string, classes: string[] }[] } classes
+ */
+async function removeManyClass(username, classes) {
+  // const remove_id = [];
+  for(const item of classes) {
+    const res = await Course.findOneAndUpdate(
+      {
+        username,
+        'courseList.course': item.course,
+      },
+      {
+        $pull: {
+          'courseList.$.classes': {
+            $in: item.classes,
+          },
+        },
+      },
+      {
+        new: true,
+      }
+    );
+    await rotaDA.removeManyRota(username, item.course, item.classes);
+    console.log(res);
+  }
+}
 
 /**
  *
@@ -157,6 +209,7 @@ async function removeClass(classInfo) {
   console.log('remove class', res);
 }
 
+
 /**
  *
  * @param { username: string, course: string, className: string, newVal: { className: string }} classInfo
@@ -219,5 +272,6 @@ module.exports = {
   getCoursesList,
   addClass,
   removeClass,
+  removeManyClass,
   updateClass,
 };

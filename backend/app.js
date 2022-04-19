@@ -21,7 +21,7 @@ app.use(BodyPraser());
 app.use(function(ctx, next){
   return next().catch((err) => {
     if (401 == err.statusCode ) {// token 失效
-      setStatus(ctx, 401, null, '\'token 失效请重新登录');
+      setStatus(ctx, 401, { message: '\'token 失效请重新登录' });
     } else {
       throw err;
     }

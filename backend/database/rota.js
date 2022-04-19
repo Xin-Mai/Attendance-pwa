@@ -59,10 +59,34 @@ async function addRota(newRota) {
 
 /**
  *
- * @param {username: string, course: string, className: string} rotaInfo
+ * @param { username: string, course: string, className: string } rotaInfo
+ * @returns { document }
  */
 async function removeRota(rotaInfo) {
   const res = await Rota.findOneAndRemove(rotaInfo, { new: true });
+  return res;
+}
+
+/**
+ *
+ * @param { string } username
+ * @param { string } course
+ * @param { string[] } classes
+ */
+async function removeManyRota(username, course, classes) {
+  const res = await Rota.deleteMany(
+    {
+      username,
+      course,
+      className: {
+        $in: classes,
+      },
+    },
+    {
+      new: true,
+    }
+  );
+  console.log('remove many rotas', res);
   return res;
 }
 
@@ -107,6 +131,7 @@ module.exports = {
   addRota,
   getClassRota,
   removeRota,
+  removeManyRota,
   setRota,
   addToRota,
 };
