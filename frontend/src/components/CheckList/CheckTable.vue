@@ -165,9 +165,13 @@ export default defineComponent({
       },
     };
 
-    const submitData = () => {
+    function getRawData(): Row[] {
       fillData();
-      emit('submit', toRaw(data.value));
+      return toRaw(data.value);
+    }
+
+    const submitData = () => {
+      emit('submit', getRawData());
     };
 
     // 将没有选择缺勤原因的默认为请假
@@ -232,6 +236,7 @@ export default defineComponent({
       data,
       curIndex,
       // 确认
+      getRawData,
       submitData,
       // 缺勤对话框
       statusChange,
@@ -241,7 +246,6 @@ export default defineComponent({
       showAbsentModal,
       logAbsent,
       closeAbsentModal,
-      test: ref(false),
     };
   },
 });
