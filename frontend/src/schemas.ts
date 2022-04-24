@@ -83,7 +83,7 @@ export interface AbsentForm {
 }
 
 export interface Row {
-  key: string | number;
+  key?: string | number;
   uid: string;
   name: string;
   status: boolean;

@@ -1,52 +1,92 @@
 <template>
   <common-header title="考勤记录" :backable="true"></common-header>
   <a-card
+    :title="`${className} ${course} ${ISOSformatter(date)}考勤记录`"
     :tab-list="tabList"
     :active-tab-key="activeKey"
     @tab-change="onTabChange"
   >
-    <a-table
-      v-if="activeKey === 'absent'"
-      :columns="absentColumns"
-      :data-source="absentData"
-      :scroll="{ x: true }"
-      row-key="uid"
-      :pagination="false"
-    >
-      <template #bodyCell="{ column, record }">
-        <span v-if="column.key === 'status'">缺勤</span>
-        <span v-else-if="column.key === 'reason'">
-          {{ ReasonArray[record.absentDetail.reason] }}
-        </span>
-      </template>
-      <template #footer>共计缺勤 {{ absentData.length }} 人</template>
-    </a-table>
-    <a-table
-      v-else-if="activeKey === 'present'"
-      :columns="presentColumns"
-      :data-source="presentData"
-      row-key="uid"
-      :pagination="false"
-    >
-      <template #bodyCell="{ column }">
-        <span v-if="column.key === 'status'">出勤</span>
-      </template>
-      <template #footer>共计出勤 {{ presentData.length }} 人</template>
-    </a-table>
+    <template #extra>
+      <a-switch
+        v-model:checked="isModified"
+        checked-children="修改"
+        un-checked-children="取消"
+      />
+    </template>
+    <keep-alive>
+      <div v-if="activeKey === 'absent'">
+        <check-table
+          v-if="isModified"
+          ref="absentTable"
+          :course="course"
+          :class-name="className"
+          :rota="absentData"
+          :is-history="true"
+          @submit="submitModify"
+        ></check-table>
+        <a-table
+          v-else
+          :columns="absentColumns"
+          :data-source="absentData"
+          :scroll="{ x: true }"
+          row-key="uid"
+          :pagination="false"
+        >
+          <template #bodyCell="{ column, record }">
+            <span v-if="column.key === 'status'">缺勤</span>
+            <span v-else-if="column.key === 'reason'">
+              {{ ReasonArray[record.absentDetail.reason] }}
+            </span>
+          </template>
+          <template #footer>共计缺勤 {{ absentData.length }} 人</template>
+        </a-table>
+      </div>
+      <div v-else-if="activeKey === 'present'">
+        <check-table
+          v-if="isModified"
+          ref="presentTable"
+          :course="course"
+          :class-name="className"
+          :rota="presentData"
+          :is-history="true"
+          @submit="submitModify"
+        ></check-table>
+        <a-table
+          v-else
+          :columns="presentColumns"
+          :data-source="presentData"
+          row-key="uid"
+          :pagination="false"
+        >
+          <template #bodyCell="{ column }">
+            <span v-if="column.key === 'status'">出勤</span>
+          </template>
+          <template #footer>共计出勤 {{ presentData.length }} 人</template>
+        </a-table>
+      </div>
+    </keep-alive>
   </a-card>
 </template>
 
 <script lang="ts">
 import { defineComponent, Ref, ref } from 'vue';
+
+import CheckTable from '/@/components/CheckList/CheckTable.vue';
 import CommonHeader from '/@/components/common/Header.vue';
+import CommonFooter from '/@/components/common/Footer.vue';
+import { Modal } from 'ant-design-vue';
+
 import { AttendanceRecord } from '/@/api/schema';
 import type { TableColumnsType } from 'ant-design-vue';
 import { AttendRecordApi } from '../api/attend';
-import { ReasonArray } from '/@/schemas';
+import { ReasonArray, Row } from '/@/schemas';
+
+import { ISOSformatter } from '/@/utils/util';
 
 export default defineComponent({
   name: 'AttendanceRecord',
   components: {
+    CheckTable,
     CommonHeader,
   },
   props: {
@@ -64,6 +104,9 @@ export default defineComponent({
     },
   },
   setup(props) {
+    const absentTable: Ref<typeof CheckTable | null> = ref(null);
+    const presentTable: Ref<typeof CheckTable | null> = ref(null);
+    const isModified: Ref<boolean> = ref(false);
     const activeKey: Ref<string> = ref('absent');
 
     const tabList = [
@@ -141,7 +184,40 @@ export default defineComponent({
       activeKey.value = key;
     };
 
+    const submitModify = () => {
+      if (!absentTable.value || !presentTable.value) return;
+      const records: AttendanceRecord[] = [
+        ...absentTable.value.getRawData(),
+        ...presentTable.value.getRawData(),
+      ];
+      console.log(records);
+      Modal.confirm({
+        title: '确定修改签到历史记录吗?',
+        content: '修改后的记录将覆盖原记录',
+        okText: '确认',
+        cancelText: '取消',
+        async onOk() {
+          try {
+            await modifyHistory(records);
+            getData();
+          } catch (e) {
+            console.log(e);
+          }
+        },
+        onCancel() {
+          console.log('Cancel');
+        },
+      });
+    };
+
+    async function modifyHistory(records) {
+      console.log(records);
+    }
+
     return {
+      absentTable,
+      presentTable,
+      ISOSformatter,
       ReasonArray,
       tabList,
       presentColumns,
@@ -150,6 +226,11 @@ export default defineComponent({
       presentData,
       activeKey,
       onTabChange,
+      isModified,
+      setModified: (val: boolean) => {
+        isModified.value = val;
+      },
+      submitModify,
     };
   },
 });

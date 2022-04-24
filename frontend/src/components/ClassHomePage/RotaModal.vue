@@ -93,7 +93,7 @@ export default defineComponent({
         emit('submit');
       } catch (err) {
         failed.value = true;
-        failedMessage.value = err;
+        failedMessage.value = err as string;
       }
       confirmLoading.value = false;
       // emit('close');
