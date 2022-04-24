@@ -13,7 +13,7 @@
     "esModuleInterop": true,
     "noImplicitAny": false,
     "skipLibCheck": true,
-    "lib": ["esnext", "dom"],
+    "lib": ["esnext", "dom", "WebWorker"],
     "types": ["vite/client"],
     "paths": {
       "/@/*": ["./src/*"],
