@@ -32,6 +32,13 @@ export interface AttendanceRequest {
   records: AttendanceRecord[];
 }
 
+export interface AttendanceModifyRequest {
+  course: string;
+  className: string;
+  date: string;
+  records: AttendanceRecord[];
+}
+
 export interface AttendanceResponseInfo {
   date: string;
   present: number;

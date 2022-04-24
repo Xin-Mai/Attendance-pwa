@@ -7,7 +7,6 @@ import {
 } from 'vue-router';
 import CheckList from '../views/CheckList.vue';
 import Login from '../views/Login.vue';
-import Test from '../views/ClassHomePage.vue';
 import ClassesList from '../views/Classes.vue';
 import Store from '/@/store/store';
 import ClassHomePageVue from '../views/ClassHomePage.vue';
@@ -41,16 +40,14 @@ const routes: Array<RouteRecordRaw> = [
     props: true,
   },
   {
-    path: '/records/:course/:className',
+    path: '/records/:course/:className/:date',
     name: 'attendanceRecord',
     component: AttendanceRecord,
     props: true,
   },
   {
-    path: '/test/:course/:className',
-    name: 'test',
-    component: Test,
-    props: true,
+    path: '/:pathMatch(.*)',
+    redirect: '/',
   },
 ];
 

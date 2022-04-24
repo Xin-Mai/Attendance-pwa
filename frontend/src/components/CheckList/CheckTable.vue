@@ -54,6 +54,7 @@ import { AbsentForm, AbsentReason, columns, Row } from '/@/schemas';
 import CommonFooter from '/@/components/common/Footer.vue';
 import { AttendanceRecord, RotaResponseItem } from '/@/api/schema';
 import { ClassRotaApi } from '/@/api/course';
+import { Key } from 'ant-design-vue/lib/_util/type';
 
 export default defineComponent({
   name: 'CheckTable',
@@ -88,9 +89,7 @@ export default defineComponent({
         }
       );
     }
-
-    // 没有初始数据
-    const selectedKeys = ref<(number | string)[]>([]);
+    const selectedRowKeys: Ref<Key[]> = ref([]);
     if (!props.isHistory) {
       getRota();
     } else {
@@ -102,7 +101,7 @@ export default defineComponent({
           ...rota[i],
         });
         if (rota[i].status) {
-          selectedKeys.value.push(i);
+          selectedRowKeys.value.push(i);
         }
       }
       data.value = dataSource;
@@ -153,10 +152,10 @@ export default defineComponent({
         record.status = selected;
         statusChange(record.key);
       },
-      selectedRowKeys: selectedKeys.value,
+      selectedRowKeys,
       // 全选与取消全选应该在这里处理
       onChange: (newSelectedRowKeys) => {
-        selectedKeys.value = newSelectedRowKeys;
+        selectedRowKeys.value = newSelectedRowKeys;
         // console.log(
         //   `selectedRowKeys: ${newSelectedRowKeys}`,
         //   'selectedRows: ',
