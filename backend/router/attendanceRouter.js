@@ -16,4 +16,8 @@ router.post('attendRecord', '/attend/record', async (ctx) => {
   await AttendanceController.getRecord(ctx);
 });
 
+router.post('modifyHistory', '/attend/modify', async (ctx) => {
+  await AttendanceController.modifyHistory(ctx);
+});
+
 module.exports = router;

@@ -69,7 +69,7 @@ async function addAttendance(attendRecord) {
  * @returns { date, present, presentPercent }
  */
 async function getHistory(attendInfo) {
-  const documents = await Attendance.find(attendInfo, { _id: 0 }, { lean: true });
+  const documents = await Attendance.find(attendInfo, { _id: 0 }, { lean: true }) || [];
   const history = documents.reduce((val, cur) => {
     const { present, presentPercent } = getPresent(cur.records);
     console.log(cur.date, Object.prototype.toString.apply(cur.date));
@@ -110,15 +110,37 @@ async function getRecord(recordInfo) {
       'records._id': 0,
       'records.absentDetail._id': 0},
     { lean: true }
-  );
+  ) || { records: [] };
   console.log('getRecords', records);
   return records;
 }
 
+
+/**
+ *
+ * @param { username: string; course: string; className: string; records: [] } historyInfo
+ */
+async function modifyHistory(historyInfo) {
+  const { records, ...info } = historyInfo;
+  const res = await Attendance.findOneAndUpdate(
+    info,
+    {
+      $set: {
+        records,
+      },
+    },
+    {
+      new: true,
+    }
+  );
+  console.log('modify history', res);
+  return res;
+}
 // getHistory({ username: 'xin', className: '1806', course: '软件工程'});
 // getRecord({ username: 'xin', className: '1806', course: '软件工程', date: '2022-04-16T14:28:34.421Z'});
 module.exports = {
   addAttendance,
   getHistory,
   getRecord,
+  modifyHistory,
 };

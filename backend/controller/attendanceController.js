@@ -23,8 +23,16 @@ async function getRecord(ctx) {
   setStatus(ctx, 200, record);
 }
 
+async function modifyHistory(ctx) {
+  const { username } = ctx.state.user;
+  const info = ctx.request.body;
+  await attendDA.modifyHistory({ username, ...info });
+  setStatus(ctx, 200);
+}
+
 module.exports = {
   attend,
   getHistory,
   getRecord,
+  modifyHistory,
 };
