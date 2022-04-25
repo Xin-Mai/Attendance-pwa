@@ -1,7 +1,10 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import ReloadPrompt from '/@/components/common/ReloadPrompt.vue';
+</script>
 
 <template>
   <router-view />
+  <ReloadPrompt />
 </template>
 
 <style>

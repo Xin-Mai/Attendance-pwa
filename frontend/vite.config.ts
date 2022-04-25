@@ -1,6 +1,6 @@
-import { ConfigEnv, defineConfig, loadEnv, UserConfig } from 'vite';
-import vue from '@vitejs/plugin-vue';
-import { ManifestOptions, VitePWA, VitePWAOptions } from 'vite-plugin-pwa';
+import { ConfigEnv, defineConfig, loadEnv, UserConfigExport } from 'vite';
+import Vue from '@vitejs/plugin-vue';
+import { VitePWA, VitePWAOptions } from 'vite-plugin-pwa';
 import { resolve } from 'path';
 
 function pathResolve(dir: string) {
@@ -8,50 +8,52 @@ function pathResolve(dir: string) {
 }
 
 const pwaOptions: Partial<VitePWAOptions> = {
-  mode: 'development',
-  base: '/',
-  includeAssets: ['favicon.svg', 'robots.txt'],
-  strategies: 'injectManifest',
-  srcDir: 'src',
-  filename: 'sw.ts',
+  includeAssets: [
+    'favicon.svg',
+    'favicon.ico',
+    'robots.txt',
+    'apple-touch-icon.png',
+  ],
+  // strategies: 'injectManifest',
+  // srcDir: 'src',
+  // filename: 'sw.ts',
+  registerType: 'prompt',
+  workbox: {
+    skipWaiting: true,
+    clientsClaim: true,
+  },
   manifest: {
-    name: '学生考勤系统',
-    short_name: 'Attendance',
+    name: '考勤系统',
+    short_name: 'Short name of your app',
+    description: 'Description of your app',
     theme_color: '#ffffff',
     icons: [
       {
-        src: 'pwa-192x192.png', // <== don't add slash, for testing
+        src: 'pwa-192x192.png',
         sizes: '192x192',
         type: 'image/png',
       },
       {
-        src: '/pwa-512x512.png', // <== don't remove slash, for testing
+        src: 'pwa-512x512.png',
         sizes: '512x512',
         type: 'image/png',
       },
       {
-        src: 'pwa-512x512.png', // <== don't add slash, for testing
+        src: 'pwa-512x512.png',
         sizes: '512x512',
         type: 'image/png',
         purpose: 'any maskable',
       },
     ],
   },
-  devOptions: {
-    enabled: process.env.SW_DEV === 'true',
-    /* when using generateSW the PWA plugin will switch to classic */
-    type: 'module',
-    navigateFallback: 'index.html',
-  },
 };
 
-// https://vitejs.dev/config/
-export default ({ mode }: ConfigEnv): UserConfig => {
+export default ({ mode }: ConfigEnv): UserConfigExport => {
   const root = process.cwd();
-
   const env = loadEnv(mode, root);
-  return {
-    plugins: [vue(), VitePWA(pwaOptions)],
+
+  return defineConfig({
+    plugins: [Vue(), VitePWA(pwaOptions)],
     resolve: {
       alias: [
         // /@/xxxx => src/xxxx
@@ -77,5 +79,5 @@ export default ({ mode }: ConfigEnv): UserConfig => {
     preview: {
       host: env.VITE_HOST,
     },
-  };
+  });
 };

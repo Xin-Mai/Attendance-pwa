@@ -19,7 +19,7 @@
       "/@/*": ["./src/*"],
     },
   },
-  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue"],
+  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue", "public/sw.ts", "env.d.ts"],
   "exclude": [
     "node_modules"
   ],
