@@ -1,12 +1,6 @@
-import { defineConfig } from 'vite';
-import Vue from '@vitejs/plugin-vue';
-import { ManifestOptions, VitePWA, VitePWAOptions } from 'vite-plugin-pwa';
-import { resolve } from 'path';
-
-function pathResolve(dir: string) {
-  return resolve(process.cwd(), '.', dir);
-}
-
+import { defineConfig } from 'vite'
+import Vue from '@vitejs/plugin-vue'
+import { ManifestOptions, VitePWA, VitePWAOptions } from 'vite-plugin-pwa'
 // import replace from '@rollup/plugin-replace'
 
 const pwaOptions: Partial<VitePWAOptions> = {
@@ -15,7 +9,7 @@ const pwaOptions: Partial<VitePWAOptions> = {
   includeAssets: ['favicon.svg'],
   strategies: 'injectManifest',
   srcDir: 'src',
-  filename: 'sw.ts',
+  filename: 'prompt-sw.ts',
   manifest: {
     name: 'PWA Router',
     short_name: 'PWA Router',
@@ -45,7 +39,7 @@ const pwaOptions: Partial<VitePWAOptions> = {
     type: 'module',
     navigateFallback: 'index.html',
   },
-};
+}
 
 // const replaceOptions = { __DATE__: new Date().toISOString() }
 
@@ -59,13 +53,4 @@ export default defineConfig({
     VitePWA(pwaOptions),
     // replace(replaceOptions),
   ],
-  resolve: {
-    alias: [
-      // /@/xxxx => src/xxxx
-      {
-        find: /\/@\//,
-        replacement: pathResolve('src') + '/',
-      },
-    ],
-  },
-});
+})
