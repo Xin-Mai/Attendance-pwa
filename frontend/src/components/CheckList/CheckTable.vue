@@ -144,7 +144,8 @@ export default defineComponent({
     // ];
 
     // 出勤checkbox配置
-    const rowSelection: TableProps['rowSelection'] = {
+    // const rowSelection: TableProps['rowSelection'] = {
+    const rowSelection = {
       fixed: true,
       columnTitle: '签到',
       onSelect: (record, selected) => {

@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite';
+import { ConfigEnv, defineConfig, loadEnv, UserConfig } from 'vite';
 import Vue from '@vitejs/plugin-vue';
 import { ManifestOptions, VitePWA, VitePWAOptions } from 'vite-plugin-pwa';
 import { resolve } from 'path';
@@ -16,6 +16,9 @@ const pwaOptions: Partial<VitePWAOptions> = {
   strategies: 'injectManifest',
   srcDir: 'src',
   filename: 'sw.ts',
+  workbox: {
+    sourcemap: true,
+  },
   manifest: {
     name: 'PWA Router',
     short_name: 'PWA Router',
@@ -48,24 +51,42 @@ const pwaOptions: Partial<VitePWAOptions> = {
 };
 
 // const replaceOptions = { __DATE__: new Date().toISOString() }
+export default ({ mode }: ConfigEnv): UserConfig => {
+  const root = process.cwd();
 
-export default defineConfig({
-  // base: process.env.BASE_URL || 'https://github.com/',
-  build: {
-    sourcemap: process.env.SOURCE_MAP === 'true',
-  },
-  plugins: [
-    Vue(),
-    VitePWA(pwaOptions),
-    // replace(replaceOptions),
-  ],
-  resolve: {
-    alias: [
-      // /@/xxxx => src/xxxx
-      {
-        find: /\/@\//,
-        replacement: pathResolve('src') + '/',
+  const env = loadEnv(mode, root);
+  return {
+    build: {
+      sourcemap: process.env.SOURCE_MAP === 'true',
+    },
+    plugins: [Vue(), VitePWA(pwaOptions)],
+    optimizeDeps: {
+      include: ['echarts'],
+    },
+    resolve: {
+      alias: [
+        // /@/xxxx => src/xxxx
+        {
+          find: /\/@\//,
+          replacement: pathResolve('src') + '/',
+        },
+      ],
+    },
+    server: {
+      port: parseInt(env.VITE_PORT),
+      host: env.VITE_HOST,
+      strictPort: false,
+      https: false,
+      proxy: {
+        [env.VITE_API_URL]: {
+          target: env.VITE_API_PROXY,
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/api/, ''),
+        },
       },
-    ],
-  },
-});
+    },
+    preview: {
+      host: env.VITE_HOST,
+    },
+  };
+};
