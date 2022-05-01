@@ -2,6 +2,7 @@ import {
   precacheAndRoute,
   cleanupOutdatedCaches,
   createHandlerBoundToURL,
+  matchPrecache,
 } from 'workbox-precaching';
 import {
   Route,
@@ -11,11 +12,11 @@ import {
 } from 'workbox-routing';
 import {
   CacheFirst,
-  NetworkFirst,
   NetworkOnly,
   StaleWhileRevalidate,
 } from 'workbox-strategies';
 import { ExpirationPlugin } from 'workbox-expiration';
+import { BackgroundSyncPlugin } from 'workbox-background-sync';
 
 declare let self: ServiceWorkerGlobalScope;
 
@@ -25,6 +26,8 @@ self.addEventListener('message', (event) => {
 
 // self.__WB_MANIFEST is default injection point
 precacheAndRoute(self.__WB_MANIFEST);
+const FALLBACK_HTML_URL = '/offline.html';
+const FALLBACK_IMAGE_URL = '/offline-image.png';
 
 // clean old assets
 cleanupOutdatedCaches();
@@ -87,25 +90,39 @@ const stylesRoute = new Route(
   })
 );
 
-// const apiRoute = new Route(
-//   ({ url }) => {
-//     return /.*\/api\/.*/.test(url.pathname);
-//   },
-//   new NetworkOnly(),
-//   'POST'
-// );
-
 // 用于捕获routing的错误
-setCatchHandler(async ({ url, event, params }) => {
-  console.log(url, event, params, 'failed');
-  return new Response('some err occurred in the workbox');
+setCatchHandler(async ({ request }) => {
+  let offline;
+  switch (request.destination) {
+    case 'document':
+      offline = matchPrecache(FALLBACK_HTML_URL);
+      return offline ? offline : Response.error();
+    case 'image':
+      offline = matchPrecache(FALLBACK_IMAGE_URL);
+      return offline ? offline : Response.error();
+    default:
+      return Response.error();
+  }
 });
 
-// Register routes
-// registerRoute(imageRoute);
-// registerRoute(scriptsRoute);
-// registerRoute(stylesRoute);
+// 离线发送失败的请求等待联网再次发送
+const bgSyncPlugin = new BackgroundSyncPlugin('failedQueue', {
+  maxRetentionTime: 24 * 60, // Retry for max of 24 Hours (specified in minutes)
+});
+
+// 对/api没有联网时的请求进行存储
+const apiRoute = new Route(
+  ({ url }) => {
+    return /\/api\/login/.test(url.pathname);
+  },
+  new NetworkOnly({
+    plugins: [bgSyncPlugin],
+  }),
+  'POST'
+);
+
 curryRegisterRouter(imageRoute).use(scriptsRoute).use(stylesRoute);
+// .use(apiRoute);
 
 // to allow work offline
 // respond to all navigation requests, for single page app
