@@ -121,8 +121,10 @@ const apiRoute = new Route(
   'POST'
 );
 
-curryRegisterRouter(imageRoute).use(scriptsRoute).use(stylesRoute);
-// .use(apiRoute);
+curryRegisterRouter(imageRoute)
+  .use(scriptsRoute)
+  .use(stylesRoute)
+  .use(apiRoute);
 
 // to allow work offline
 // respond to all navigation requests, for single page app
