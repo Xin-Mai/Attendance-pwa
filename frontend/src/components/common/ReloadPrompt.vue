@@ -8,7 +8,6 @@ const reloadSW: any = '__RELOAD_SW__';
 const { offlineReady, needRefresh, updateServiceWorker } = useRegisterSW({
   immediate: true,
   onRegistered(r) {
-    console.log(r);
     if (reloadSW === 'true') {
       r &&
         setInterval(async () => {
@@ -21,8 +20,6 @@ const { offlineReady, needRefresh, updateServiceWorker } = useRegisterSW({
   },
 });
 
-console.log('updateServiceWorker', updateServiceWorker);
-
 const close = async () => {
   offlineReady.value = false;
   needRefresh.value = false;
@@ -33,12 +30,10 @@ const close = async () => {
   <div v-if="offlineReady || needRefresh" class="pwa-toast" role="alert">
     <div class="message">
       <span v-if="offlineReady"> App ready to work offline </span>
-      <span v-else>
-        New content available, click on reload button to update.
-      </span>
+      <span v-else> 有新的版本可应用，现在更新 </span>
     </div>
-    <button v-if="needRefresh" @click="updateServiceWorker()">Reload</button>
-    <button @click="close">Close</button>
+    <button v-if="needRefresh" @click="updateServiceWorker()">更新</button>
+    <button @click="close">取消</button>
   </div>
 </template>
 

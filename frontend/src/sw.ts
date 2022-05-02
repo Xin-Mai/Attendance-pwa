@@ -108,6 +108,19 @@ setCatchHandler(async ({ request }) => {
 // 离线发送失败的请求等待联网再次发送
 const bgSyncPlugin = new BackgroundSyncPlugin('failedQueue', {
   maxRetentionTime: 24 * 60, // Retry for max of 24 Hours (specified in minutes)
+  onSync: async ({ queue }) => {
+    await queue.replayRequests();
+    // 重新请求后页面进行刷新
+    console.log('sync');
+    self.clients.matchAll({ type: 'window' }).then((clients) => {
+      if (clients && clients.length) {
+        console.log(clients);
+        clients[0].postMessage({
+          type: 'refresh',
+        });
+      }
+    });
+  },
 });
 
 // 对/api没有联网时的请求进行存储
