@@ -12,7 +12,12 @@ function pathResolve(dir: string) {
 const pwaOptions: Partial<VitePWAOptions> = {
   mode: 'development',
   base: '/',
-  includeAssets: ['/public/favicon.svg', 'offline-image.png', 'offline.html'],
+  includeAssets: [
+    'favicon.ico',
+    'favicon.svg',
+    '*.png',
+    'offline/offline.html',
+  ],
   strategies: 'injectManifest',
   srcDir: 'src',
   filename: 'sw.ts',

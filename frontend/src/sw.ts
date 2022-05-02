@@ -26,8 +26,17 @@ self.addEventListener('message', (event) => {
 
 // self.__WB_MANIFEST is default injection point
 precacheAndRoute(self.__WB_MANIFEST);
-const FALLBACK_HTML_URL = '/offline.html';
-const FALLBACK_IMAGE_URL = '/offline-image.png';
+const FALLBACK_HTML_URL = 'offline/offline.html';
+const FALLBACK_IMAGE_URL = 'offline/offline-image.png';
+
+precacheAndRoute([
+  {
+    url: FALLBACK_HTML_URL,
+  },
+  {
+    url: FALLBACK_IMAGE_URL,
+  },
+]);
 
 // clean old assets
 cleanupOutdatedCaches();
@@ -111,7 +120,6 @@ const bgSyncPlugin = new BackgroundSyncPlugin('failedQueue', {
   onSync: async ({ queue }) => {
     await queue.replayRequests();
     // 重新请求后页面进行刷新
-    console.log('sync');
     self.clients.matchAll({ type: 'window' }).then((clients) => {
       if (clients && clients.length) {
         console.log(clients);

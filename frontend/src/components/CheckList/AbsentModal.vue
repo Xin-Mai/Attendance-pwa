@@ -10,13 +10,13 @@
         <a-input :value="name" :disabled="true"></a-input>
       </a-form-item>
       <a-form-item label="缺勤原因">
-        <a-select
-          v-model:value="formState.reason"
-          :options="options"
-        ></a-select>
+        <a-select :value="formState.reason" :options="options"></a-select>
       </a-form-item>
       <a-form-item label="备注">
-        <a-input v-model:value="formState.ps"></a-input>
+        <a-input :value="formState.ps"></a-input>
+      </a-form-item>
+      <a-form-item label="上传图片">
+        <pic-upload />
       </a-form-item>
     </a-form>
   </a-modal>
@@ -26,9 +26,13 @@
 import type { SelectProps } from 'ant-design-vue';
 import { defineComponent, reactive, UnwrapRef, ref, toRaw, watch } from 'vue';
 import { AbsentForm, AbsentReason } from '/@/schemas';
+import PicUpload from './PicUpload.vue';
 
 export default defineComponent({
   name: 'AbsentModal',
+  components: {
+    PicUpload,
+  },
   props: {
     visible: {
       type: Boolean,
