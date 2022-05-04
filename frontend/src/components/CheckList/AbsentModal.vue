@@ -10,13 +10,16 @@
         <a-input :value="name" :disabled="true"></a-input>
       </a-form-item>
       <a-form-item label="缺勤原因">
-        <a-select :value="formState.reason" :options="options"></a-select>
+        <a-select
+          v-model:value="formState.reason"
+          :options="options"
+        ></a-select>
       </a-form-item>
       <a-form-item label="备注">
-        <a-input :value="formState.ps"></a-input>
+        <a-input v-model:value="formState.ps"></a-input>
       </a-form-item>
       <a-form-item label="上传图片">
-        <pic-upload />
+        <pic-upload ref="picUpload" :img-url="imgUrl" />
       </a-form-item>
     </a-form>
   </a-modal>
@@ -50,12 +53,18 @@ export default defineComponent({
       type: String,
       default: '',
     },
+    imgUrl: {
+      type: String,
+      default: '',
+    },
   },
   emits: ['close', 'logAbsent'],
   setup(props, { emit }) {
+    const picUpload: Ref<typeof picUpload | null> = ref(null);
     const formState: UnwrapRef<AbsentForm> = reactive({
       reason: props.reason,
       ps: props.ps,
+      imgUrl: props.imgUrl,
     });
 
     const options = ref<SelectProps['options']>([
@@ -84,12 +93,15 @@ export default defineComponent({
     );
 
     const handleOK = () => {
-      console.log('ok');
+      const imgUrl: string = picUpload.value?.getPic() || '';
+      formState.imgUrl = imgUrl;
       // 返回值的拷贝
       emit('logAbsent', { ...toRaw(formState) });
+      picUpload.value?.clear();
     };
 
     return {
+      picUpload,
       formState,
       options,
       handleOK,

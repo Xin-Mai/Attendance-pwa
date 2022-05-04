@@ -1,100 +1,112 @@
 <template>
-  <div class="clearfix">
-    <a-upload
-      :file-list="fileList"
-      :max-count="4"
-      list-type="picture-card"
-      :before-upload="beforeUpload"
-      :custom-request="customRequest"
-      @preview="handlePreview"
-    >
-      <div v-if="fileList && fileList.length < 8">
-        <plus-outlined />
-        <div style="margin-top: 8px">Upload</div>
-      </div>
-    </a-upload>
-    <a-modal
-      :visible="previewVisible"
-      :title="previewTitle"
-      :footer="null"
-      @cancel="handleCancel"
-    >
-      <img alt="example" style="width: 100%" :src="previewImage" />
-    </a-modal>
-  </div>
+  <a-upload
+    v-model:file-list="fileList"
+    name="avatar"
+    list-type="picture-card"
+    class="avatar-uploader"
+    :show-upload-list="false"
+    :before-upload="beforeUpload"
+  >
+    <div v-if="imageUrl" class="img-container">
+      <img :src="imageUrl" alt="avatar" style="width: 100%; height: 100%" />
+      <DeleteOutlined
+        class="delete-button"
+        style="color: red"
+        @click.stop="clear"
+      />
+    </div>
+    <div v-else>
+      <loading-outlined v-if="loading"></loading-outlined>
+      <plus-outlined v-else></plus-outlined>
+      <div class="ant-upload-text">Upload</div>
+    </div>
+  </a-upload>
 </template>
 <script lang="ts">
-import { PlusOutlined } from '@ant-design/icons-vue';
-import { defineComponent, ref } from 'vue';
-import type { UploadProps } from 'ant-design-vue';
+import {
+  PlusOutlined,
+  LoadingOutlined,
+  DeleteOutlined,
+} from '@ant-design/icons-vue';
 import { message } from 'ant-design-vue';
+import { defineComponent, ref, Ref, watch } from 'vue';
+import type { UploadProps } from 'ant-design-vue';
 
-function getBase64(file: File) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = (error) => reject(error);
-  });
+function getBase64(img: Blob, callback: (base64Url: string) => void) {
+  const reader = new FileReader();
+  reader.addEventListener('load', () => callback(reader.result as string));
+  reader.readAsDataURL(img);
 }
-
 export default defineComponent({
-  name: 'PicUpload',
   components: {
+    LoadingOutlined,
     PlusOutlined,
+    DeleteOutlined,
   },
-  setup() {
-    const previewVisible = ref(false);
-    const previewImage = ref('');
-    const previewTitle = ref('');
+  props: {
+    imgUrl: {
+      type: String,
+      default: '',
+    },
+  },
+  setup(props) {
+    const fileList: Ref<File> = ref(new Array<File>());
+    const loading = ref<boolean>(false);
+    const imageUrl = ref<string>('');
 
-    const fileList = ref<UploadProps['fileList']>([]);
+    watch(
+      () => props.imgUrl,
+      (newVal) => {
+        imageUrl.value = newVal;
+      }
+    );
 
-    const handleCancel = () => {
-      previewVisible.value = false;
-      previewTitle.value = '';
-    };
-
-    const beforeUpload: UploadProps['beforeUpload'] = (file) => {
-      const isPic =
-        file.type === 'image/png' ||
+    const beforeUpload = (file: File) => {
+      loading.value = true;
+      const isJpgOrPng =
         file.type === 'image/jpeg' ||
+        file.type === 'image/png' ||
         file.type === 'image/jpg';
-      if (!isPic) {
-        message.error(`${file.name} is not a png file`);
+      if (!isJpgOrPng) {
+        message.error('You can only upload JPG file!');
+        loading.value = false;
       }
-      return isPic;
-    };
-
-    const handlePreview = async (file: any) => {
-      if (!file.url && !file.preview) {
-        file.preview = (await getBase64(file.originFileObj)) as string;
+      const isLt2M = file.size / 1024 / 1024 < 2;
+      if (!isLt2M) {
+        message.error('Image must smaller than 2MB!');
+        loading.value = false;
       }
-      previewImage.value = file.url || file.preview;
-      previewVisible.value = true;
-      previewTitle.value =
-        file.name || file.url.substring(file.url.lastIndexOf('/') + 1);
-    };
-
-    const customRequest = ({ filename, file }) => {
-      console.log('upload file', filename, file);
+      if (isLt2M && isJpgOrPng) {
+        fileList.value = [file];
+        getBase64(file, (base64Url: string) => {
+          imageUrl.value = base64Url;
+          loading.value = false;
+        });
+      }
+      return false;
     };
 
     return {
-      previewVisible,
-      previewImage,
       fileList,
+      loading,
+      imageUrl,
       beforeUpload,
-      handleCancel,
-      handlePreview,
-      previewTitle,
-      customRequest,
+      getPic: () => {
+        return '' + imageUrl.value;
+      },
+      clear: () => {
+        imageUrl.value = '';
+        fileList.value = [];
+      },
     };
   },
 });
 </script>
 <style>
-/* you can make up upload button and sample style by using stylesheets */
+.avatar-uploader > .ant-upload {
+  width: 128px;
+  height: 128px;
+}
 .ant-upload-select-picture-card i {
   font-size: 32px;
   color: #999;
@@ -103,5 +115,14 @@ export default defineComponent({
 .ant-upload-select-picture-card .ant-upload-text {
   margin-top: 8px;
   color: #666;
+}
+
+.img-container {
+  width: 100%;
+  height: 100%;
+}
+
+.delete-button {
+  z-index: 2;
 }
 </style>

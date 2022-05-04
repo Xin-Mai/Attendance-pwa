@@ -32,6 +32,13 @@
               <span v-else-if="column.key === 'reason'">
                 {{ ReasonArray[record.absentDetail.reason] }}
               </span>
+              <div v-else-if="column.key === 'imgUrl'">
+                <a-image
+                  v-if="record.absentDetail.imgUrl !== ''"
+                  :src="record.absentDetail.imgUrl"
+                  style="height: 2rem"
+                />
+              </div>
             </template>
             <template #footer>共计缺勤 {{ absentData.length }} 人</template>
           </a-table>
@@ -134,6 +141,12 @@ export default defineComponent({
         title: '备注',
         dataIndex: ['absentDetail', 'ps'],
         key: 'ps',
+        width: 100,
+      },
+      {
+        title: '图片',
+        dataIndex: ['absentDetail', 'imgUrl'],
+        key: 'imgUrl',
         width: 100,
       },
     ]);

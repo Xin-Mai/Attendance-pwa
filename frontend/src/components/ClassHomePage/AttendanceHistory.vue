@@ -47,6 +47,7 @@ export default defineComponent({
         title: '日期',
         dataIndex: 'date',
         key: 'date',
+        sorter: (a: string, b: string) => a < b ? -1 : a == b ? 0 : 1 ,
       },
       {
         title: '出勤人数',

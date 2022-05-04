@@ -80,6 +80,7 @@ export interface ConfirmData {
 export interface AbsentForm {
   reason: AbsentReason;
   ps: string;
+  imgUrl?: string;
 }
 
 export interface Row {

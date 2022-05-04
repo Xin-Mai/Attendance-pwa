@@ -122,26 +122,6 @@ export default defineComponent({
         data.value = dataSource;
       }
     );
-    // const data: Row[] = [
-    //   {
-    //     key: 1,
-    //     uid: 'U201817122',
-    //     name: '麦晓欣',
-    //     status: false,
-    //   },
-    //   {
-    //     key: 2,
-    //     uid: 'U201817121',
-    //     name: '赵敏',
-    //     status: false,
-    //   },
-    //   {
-    //     key: 3,
-    //     uid: 'U201817120',
-    //     name: '张雨莹',
-    //     status: false,
-    //   },
-    // ];
 
     // 出勤checkbox配置
     // const rowSelection: TableProps['rowSelection'] = {
@@ -207,15 +187,18 @@ export default defineComponent({
       absentInfo.reason =
         data.value[index].absentDetail?.reason || AbsentReason.LEAVE;
       absentInfo.ps = data.value[index].absentDetail?.ps || '';
+      absentInfo.imgUrl = data.value[index].absentDetail?.imgUrl || '';
       absentModalVisible.value = true;
     };
 
     // 更新缺勤信息
     const logAbsent = (formState: AbsentForm) => {
-      data.value[curIndex.value].absentDetail = {
-        reason: formState.reason,
-        ps: formState.ps,
-      };
+      console.log('GET FORM STATE', formState);
+      // data.value[curIndex.value].absentDetail = {
+      //   reason: formState.reason,
+      //   ps: formState.ps,
+      // };
+      data.value[curIndex.value].absentDetail = { ...formState };
       closeAbsentModal();
     };
     const closeAbsentModal = () => {
