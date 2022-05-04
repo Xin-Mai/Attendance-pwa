@@ -11,6 +11,10 @@ const absentDetailSchema = new mongoose.Schema({
     type: String,
     required: false,
   },
+  imgUrl: {
+    type: String,
+    required: false,
+  }
 });
 
 const recordSchema = new mongoose.Schema({

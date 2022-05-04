@@ -37,7 +37,7 @@ const Rota = mongoose.model('Rota', rotaSchema);
  * @param { username: string, course: string, className: string } classInfo
  */
 async function getClassRota(rotaInfo) {
-  const { rota } = await Rota.findOne(rotaInfo, { _id: 0 }).lean() || { rota: [] };
+  const { rota } = await Rota.findOne(rotaInfo, { 'rota._id': 0 }) || { rota: [] };
   console.log('get class rota', rota);
   return rota;
 }
